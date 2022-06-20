@@ -12,17 +12,15 @@
 #include <algorithm>
 #include <cstdlib>
 
-#include <iomanip> 
+#include <iomanip>
 
     ///###### FUNCTIONS TO FIND QUANTILES
 
-template<typename T>
-static inline double Lerp(T v0, T v1, T t){
+template<typename T> static inline double Lerp(T v0, T v1, T t){
     return (1 - t)*v0 + t*v1;
 }
 
-template<typename T>
-static inline std::vector<T> Quantile(const std::vector<T>& inData, const std::vector<T>& probs){
+template<typename T> static inline std::vector<T> Quantile(const std::vector<T>& inData, const std::vector<T>& probs){
     if (inData.empty()){
         return std::vector<T>();
     }
@@ -52,7 +50,7 @@ static inline std::vector<T> Quantile(const std::vector<T>& inData, const std::v
 }
 
     ///###### SENSITIVITY ANALYSIS -- PROBABILITY OF INVASION OF DELETERIOUS MUTATIONS
-    
+
 void ReplicateSimulation        (   int carryingCapacity,
                                     bool densityDependenceSurvival,
                                     double nbOffspringPerInd,
@@ -76,9 +74,9 @@ void ReplicateSimulation        (   int carryingCapacity,
                                     int Tstep,
                                     std::string Namefile
                            ){
-    
+
     print(Namefile);
-    
+
     std::fstream dataPop;
     dataPop.open ("Data/dataPop_"+Namefile+".csv", std::fstream::in | std::fstream::out | std::fstream::trunc);
     dataPop << "Rep;" << "Time;" << "SizePop;" << "PercentOffspringDead;" << "propDeath;" << "propDeathExtrinsic;" << "propDeathMutation;" << "LifeSpan0025;" << "LifeSpan05;" << "LifeSpan0975;" << "LifeSpanMin;" << "LifeSpanMax;" << "Damage0025;" << "Damage05;" << "Damage0975;" << "DamageMin;" << "DamageMax"  << std::endl;
@@ -86,21 +84,20 @@ void ReplicateSimulation        (   int carryingCapacity,
     std::fstream dataMutationAccumulation;
     dataMutationAccumulation.open ("Data/dataMut_"+Namefile+".csv", std::fstream::in | std::fstream::out | std::fstream::trunc);
     dataMutationAccumulation << "Rep;" << "Time;" << "Damage;" << "SurvivalMutation0025;" << "SurvivalMutation05;" << "SurvivalMutation0975;" << "MeanSurvivalMutation" << std::endl;
-    
-    
+
     int indCharacSaved_rep = 0;
-    
+
     for(int rep(0); rep<NbRep; ++rep){
-    
+
         // we assess the rate of damage accumulation that matches the median damage level when linear accumulation
         if(typeAccumulation!="lin"){
-            
+
             int nbInd = 5e5;
-            
+
             //linear accumulation
             std::string func = "lin";
-            
-            std::vector<int> damageDeathVec = {}; 
+
+            std::vector<int> damageDeathVec = {};
             int ind(0);
             int damage;
             while(ind<nbInd){
@@ -114,20 +111,18 @@ void ReplicateSimulation        (   int carryingCapacity,
                         damage = age;
                     }
                     damageDeathVec.push_back(damage);
-                    
+
                     if(randomDouble()>probSurvExtrinsicMortality){
                         dead = true;
                     }
                     age = age+1;
                 }
-            }       
-            
+            }
+
             std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
             auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0.5 });
             double MedianDamageLevelLinear = quantilesDamage[0];
-            
-      
-            
+
             rateAccumul = 0;
             double rateAccumulInterv;
             if(typeAccumulation=="log"){
@@ -139,14 +134,14 @@ void ReplicateSimulation        (   int carryingCapacity,
             double epsilon = 0.5;
             while(abs(MedianDamageLevelLinearNonLinear-MedianDamageLevelLinear)>epsilon){
                 while(MedianDamageLevelLinearNonLinear<MedianDamageLevelLinear-epsilon){
-                        
+
                     rateAccumul = rateAccumul + rateAccumulInterv;
-                    
+
                     // Here we define the median damage level when deviation from linearity
-                    
+
                     std::string func = typeAccumulation;
-                    
-                    std::vector<int> damageDeathVec = {}; 
+
+                    std::vector<int> damageDeathVec = {};
                     int ind(0);
                     int damage;
                     while(ind<nbInd){
@@ -160,18 +155,18 @@ void ReplicateSimulation        (   int carryingCapacity,
                                 damage = age;
                             }
                             damageDeathVec.push_back(damage);
-                            
+
                             if(randomDouble()>probSurvExtrinsicMortality){
                                 dead = true;
                             }
                             age = age+1;
                         }
-                    }       
-                    
+                    }
+
                     std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
                     auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0.5 });
                     MedianDamageLevelLinearNonLinear = quantilesDamage[0];
-                    
+
                     print(rateAccumul);
                     print(MedianDamageLevelLinear);
                     print(MedianDamageLevelLinearNonLinear);
@@ -184,179 +179,11 @@ void ReplicateSimulation        (   int carryingCapacity,
                         rateAccumulInterv = rateAccumulInterv/10;
                     }
                 }
-            }            
-            
-            
-            
-            
-            
-            
-            /*
-            
-            
-            Population population = Population( carryingCapacity,
-                                                densityDependenceSurvival,
-                                                nbOffspringPerInd,
-                                                maxDamageConsidered,
-                                                probSurvExtrinsicMortality,
-                                                1.0,
-                                                "lin",
-                                                0.0,                            // prob of getting a deleterious mutation = 0.0 here
-                                                convertIntoYear,
-                                                rangeEffectDeleteriousMutation,
-                                                effectSurvDeleteriousMutation
-                                            );
-            // burn in phase
-            for (int t(0);t<Tburnin*12;++t) {
-                population.updateNewTimeStep();
-                population.replaceDeadIndividuals();
             }
-        
-
-            // Save data pop at t=0
-            int tmaxlinear=1e3;
-            int nbRepLinear=20;
-            Population populationSave = population;
-            std::vector<int> damageDeathVec = {}; 
-            for (int rep2(0); rep2<nbRepLinear; ++rep2){
-                population = populationSave;
-                std::vector<int> damageDeathVec2 = {}; 
-                for (int t(0);t<tmaxlinear;++t) {
-                    population.updateNewTimeStep();
-                    population.replaceDeadIndividuals();
-                }
-                
-                for (int t(0);t<tmaxlinear;++t) {
-                    population.updateNewTimeStep();
-                    // life span 
-                    for (auto iter:population._ListInd) {
-                        damageDeathVec2.push_back(iter._damage);
-                        
-                    }
-                    population.replaceDeadIndividuals();
-                }
-                            
-                std::vector<double> damageDeathVecDouble2(damageDeathVec2.begin(), damageDeathVec2.end());
-                auto quantilesDamage2 = Quantile<double>(damageDeathVecDouble2, {0.5});
-                
-                damageDeathVec.push_back(quantilesDamage2[0]);
-                
-                
-            }
-            population = populationSave;
-            
-            std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
-            auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0.5 });
-            double MedianDamageLevelLinear = quantilesDamage[0];
-            
-            
-            
-            int tmax1 = tmaxlinear;
-            int nbRep1 = nbRepLinear/10;
-            rateAccumul = 0;
-            double rateAccumulInterv;
-            if(typeAccumulation=="log"){
-                rateAccumulInterv = 10^200;
-            }else if(typeAccumulation=="exp"){
-                rateAccumulInterv = 0.01;
-            }
-            double MedianDamageLevelLinearNonLinear = 0;
-            double epsilon = 1;
-            while(abs(MedianDamageLevelLinearNonLinear-MedianDamageLevelLinear)>epsilon){
-                while(MedianDamageLevelLinearNonLinear<MedianDamageLevelLinear-epsilon){
-                        
-                    rateAccumul = rateAccumul + rateAccumulInterv;
-                    
-                    // Here we define the median damage level when deviation from linearity
-                    
-                    Population population = Population( carryingCapacity,
-                                                        densityDependenceSurvival,
-                                                        nbOffspringPerInd,
-                                                        maxDamageConsidered,
-                                                        probSurvExtrinsicMortality,
-                                                        rateAccumul,
-                                                        typeAccumulation,
-                                                        0.0,                            // prob of getting a deleterious mutation = 0.0 here
-                                                        convertIntoYear,
-                                                        rangeEffectDeleteriousMutation,
-                                                        effectSurvDeleteriousMutation
-                                                    );
-                    // burn in phase
-                    for (int t(0);t<Tburnin*12;++t) {
-                        population.updateNewTimeStep();
-                        population.replaceDeadIndividuals();
-                    }
-
-                    // Save data pop at t=0
-                    Population populationSave = population;
-                    
-                    std::vector<int> damageDeathVec = {}; 
-                    for (int rep2(0); rep2<nbRep1; ++rep2){
-                        population = populationSave;
-                        std::vector<int> damageDeathVec2 = {}; 
-                        for (int t(0);t<tmax1;++t) {
-                            population.updateNewTimeStep();
-                            population.replaceDeadIndividuals();
-                        }
-                        
-                        for (int t(0);t<tmax1;++t) {
-                            population.updateNewTimeStep();
-                            // life span 
-                            for (auto iter:population._ListInd) {
-                                damageDeathVec2.push_back(iter._damage);
-                                
-                            }
-                            population.replaceDeadIndividuals();
-                        }
-                                    
-                        std::vector<double> damageDeathVecDouble2(damageDeathVec2.begin(), damageDeathVec2.end());
-                        auto quantilesDamage2 = Quantile<double>(damageDeathVecDouble2, {0.5});
-                        
-                        damageDeathVec.push_back(quantilesDamage2[0]);
-                        
-                        
-                    }
-                    population = populationSave;
-                    
-                    std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
-                    auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0.5  });
-                    
-                    MedianDamageLevelLinearNonLinear = quantilesDamage[0];     
-                    
-                    print(rateAccumul);
-                    print(MedianDamageLevelLinear);
-                    print(MedianDamageLevelLinearNonLinear);
-                    print(rateAccumulInterv);
-                    print(nbRep1);
-                    print("");
-                    
-                    if(MedianDamageLevelLinearNonLinear>MedianDamageLevelLinear/2){
-                       nbRep1 = nbRep1*2;
-                       if(nbRep1>nbRepLinear){
-                           nbRep1 = nbRepLinear;
-                       }
-                    }
-                    if(abs(MedianDamageLevelLinearNonLinear-MedianDamageLevelLinear)<20){
-                       nbRep1 = nbRepLinear;
-                    }
-                    if(MedianDamageLevelLinearNonLinear>MedianDamageLevelLinear){
-                        rateAccumul -= rateAccumulInterv;
-                        MedianDamageLevelLinearNonLinear = 0;
-                        rateAccumulInterv = rateAccumulInterv/10;
-                    }
-                }
-            }
-            */
-
-            
         }
         print("rateAccumul :");
         print(rateAccumul);
-        
-        
-        
-        
-        
+
         // population without limit in maxDamageConsidered
         Population population = Population( carryingCapacity,
                                             densityDependenceSurvival,
@@ -374,37 +201,37 @@ void ReplicateSimulation        (   int carryingCapacity,
                                             boolReverseMutation,
                                             effectSurvDeleteriousMutation
                                         );
+
         // burn in phase
         for (int t(0);t<Tburnin*convertIntoYear;++t) {
             population.updateNewTimeStep();
             population.replaceDeadIndividuals();
         }
-    
 
         int t = 0;
         print(t);
-        
+
         // Save data pop at t=0
         Population populationSave = population;
-        std::vector<int> ageDeathVec = {}; 
-        std::vector<int> damageDeathVec = {}; 
+        std::vector<int> ageDeathVec = {};
+        std::vector<int> damageDeathVec = {};
         double popSize(0.0);
         double propOffspringDead(0.0);
         double count(0.0);
         double count2(0.0);
         double count3(0.0);
         double count4(0.0);
-                
+
         double propDeathExtrinsic(0.0);
         double propDeathMutation(0.0);
         double propDeath(0.0);
         for (int rep2(0); rep2<10; ++rep2){
             population = populationSave;
             for (int t(0);t<1e3;++t) {
-                
+
                 population.updateNewTimeStep();
-                
-                // life span 
+
+                // life span
                 for (auto iter:population._ListInd) {
                     count4+=1.0;
                     if(iter._livingState==false){
@@ -419,60 +246,54 @@ void ReplicateSimulation        (   int carryingCapacity,
                         }
                     }
                 }
-                
+
                 population.replaceDeadIndividuals();
-                
+
                 // pop size
                 popSize += (double) population._ListInd.size();
-                
-                // prop offspring 
+
+                // prop offspring
                 if(population._ListIndOfspringIndex.size()>0){
                     propOffspringDead += ((double) population._ListIndOfspringIndex.size() - ((double) population._ListInd.size() - population._ListLivingInd.size())) / ((double) population._ListIndOfspringIndex.size()) ;
                     count2+=1.0;
                 }
-                
-                // cause of death; A FAIRE
-                
                 count+=1.0;
             }
-            
         }
         population = populationSave;
-        
+
         std::vector<double> ageDeathVecDouble(ageDeathVec.begin(), ageDeathVec.end());
         auto quantiles = Quantile<double>(ageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
-        
+
         std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
         auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
 
-        dataPop << rep << ";" << t << ";" 
-                << popSize/count << ";" 
-                << propOffspringDead/count2 << ";" 
-                << propDeath/count4 << ";" 
-                << propDeathExtrinsic/count3 << ";" 
-                << propDeathMutation/count3 << ";" 
+        dataPop << rep << ";" << t << ";"
+                << popSize/count << ";"
+                << propOffspringDead/count2 << ";"
+                << propDeath/count4 << ";"
+                << propDeathExtrinsic/count3 << ";"
+                << propDeathMutation/count3 << ";"
                 << quantiles[1] << ";"
                 << quantiles[2] << ";"
-                << quantiles[3] << ";" 
-                << quantiles[0] << ";" 
-                << quantiles[4] << ";" 
+                << quantiles[3] << ";"
+                << quantiles[0] << ";"
+                << quantiles[4] << ";"
                 << quantilesDamage[1] << ";"
                 << quantilesDamage[2] << ";"
-                << quantilesDamage[3] << ";" 
-                << quantilesDamage[0] << ";" 
+                << quantilesDamage[3] << ";"
+                << quantilesDamage[0] << ";"
                 << quantilesDamage[4] << std::endl;
 
         // Save data mutation accumulation
-                
-                                
+
         int damage(0);
         while (damage<maxDamageConsidered){
-            std::vector<double> SurvMutVec = {}; 
+            std::vector<double> SurvMutVec = {};
             for (auto iter:population._ListInd) {
-//                 print(iter._survCausedPerMutation[iter._survCausedPerMutation.size()-1]);
                 if(damage<iter._survCausedPerMutation.size()){
                     SurvMutVec.push_back(iter._survCausedPerMutation[damage]);
-                }else{                            
+                }else{
                     if(iter._survCausedPerMutation[iter._survCausedPerMutation.size()-1]>1-0.001){
                         SurvMutVec.push_back(1.0);
                     }else{
@@ -483,25 +304,22 @@ void ReplicateSimulation        (   int carryingCapacity,
 
             auto quantiles2 = Quantile<double>(SurvMutVec, { 0.025, 0.5, 0.975 });
             if(mean(SurvMutVec)>1e-20){
-                dataMutationAccumulation << rep << ";" << t << ";" 
-                                            << damage << ";" 
-                                            << quantiles2[0] << ";" 
-                                            << quantiles2[1] << ";" 
-                                            << quantiles2[2] << ";" 
+                dataMutationAccumulation << rep << ";" << t << ";"
+                                            << damage << ";"
+                                            << quantiles2[0] << ";"
+                                            << quantiles2[1] << ";"
+                                            << quantiles2[2] << ";"
                                             << mean(SurvMutVec) << std::endl;
             }
             damage+=rangeEffectDeleteriousMutation;
         }
         int tCheck=(Tstep*convertIntoYear);
 
-            
         if(startAtEarlierLifeSpan==true){
             // get median lifespan
 
             int newMaxDamageConsidered = (int) (round(quantilesDamage[5])+1);
-//             print("new max damage considered:");
-//             print(newMaxDamageConsidered);
-            
+
             // population with limit in maxDamageConsidered
             population = Population( carryingCapacity,
                                      densityDependenceSurvival,
@@ -524,59 +342,52 @@ void ReplicateSimulation        (   int carryingCapacity,
                 population.updateNewTimeStep();
                 population.replaceDeadIndividuals();
             }
-                        
-        }
-        
-        
 
-        
-        
+        }
+
         // add probability to have a deleterious mutation
         population.setProbDeleteriousMutationPerAge(probDeleteriousMutationPerAge);
-        
-        
+
         // actual simulation
         bool ExtinctionPop = false;
         bool popGettingExtinct = false;
         ++t;
         while(t<Tmax*convertIntoYear+1 && ExtinctionPop == false) {
-            
+
             if(t% ((int) 1e4)==0){
                 population.shortenMutationVector(boolReverseMutation);
             }
-            
-            
-                
+
             if(population._ListInd.size()==0){
-                
-                std::cout << "EXTINCTION AT T = " <<  t<< std::endl;   
-                dataPop << rep << ";" << t << ";" 
-                        << population._ListInd.size() << ";" 
-                        << "NA" << ";" 
+
+                std::cout << "EXTINCTION AT T = " <<  t<< std::endl;
+                dataPop << rep << ";" << t << ";"
+                        << population._ListInd.size() << ";"
                         << "NA" << ";"
                         << "NA" << ";"
-                        << "NA" << ";" 
                         << "NA" << ";"
                         << "NA" << ";"
-                        << "NA" << ";" 
-                        << "NA" << ";" 
-                        << "NA" << ";" 
                         << "NA" << ";"
                         << "NA" << ";"
-                        << "NA" << ";" 
-                        << "NA" << ";" 
+                        << "NA" << ";"
+                        << "NA" << ";"
+                        << "NA" << ";"
+                        << "NA" << ";"
+                        << "NA" << ";"
+                        << "NA" << ";"
+                        << "NA" << ";"
                         << "NA" << std::endl;
                 ExtinctionPop = true;
-                
+
             }else if((((double) population._ListInd.size())/((double) carryingCapacity)<0.1 && popGettingExtinct==false) || t==tCheck){
                 if(((double) population._ListInd.size())/((double) carryingCapacity)<0.1){
                     popGettingExtinct=true;
                 }
                 print(t);
-                
+
                 // Save data pop
                 Population populationSave = population;
-                std::vector<int> ageDeathVec = {}; 
+                std::vector<int> ageDeathVec = {};
                 std::vector<int> damageDeathVec = {};
                 double popSize(0.0);
                 double propOffspringDead(0.0);
@@ -584,18 +395,18 @@ void ReplicateSimulation        (   int carryingCapacity,
                 double count2(0.0);
                 double count3(0.0);
                 double count4(0.0);
-                
+
                 double propDeathExtrinsic(0.0);
                 double propDeathMutation(0.0);
                 double propDeath(0.0);
-                
+
                 for (int rep2(0); rep2<10; ++rep2){
                     population = populationSave;
                     for (int t(0);t<1e3;++t) {
-                        
+
                         population.updateNewTimeStep();
-                        
-                        // life span 
+
+                        // life span
                         for (auto iter:population._ListInd) {
                             count4+=1.0;
                             if(iter._livingState==false){
@@ -610,61 +421,54 @@ void ReplicateSimulation        (   int carryingCapacity,
                                 }
                             }
                         }
-                        
+
                         population.replaceDeadIndividuals();
-                        
+
                         // pop size
                         popSize += (double) population._ListInd.size();
-                        
-                        // prop offspring 
+
+                        // prop offspring
                         if(population._ListIndOfspringIndex.size()>0){
                             propOffspringDead += ((double) population._ListIndOfspringIndex.size() - ((double) population._ListInd.size() - population._ListLivingInd.size())) / ((double) population._ListIndOfspringIndex.size()) ;
                             count2+=1.0;
                         }
-                        
-                        // cause of death; A FAIRE
-                        
                         count+=1.0;
                     }
-                    
+
                 }
                 population = populationSave;
-                
+
                 std::vector<double> ageDeathVecDouble(ageDeathVec.begin(), ageDeathVec.end());
                 auto quantiles = Quantile<double>(ageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1  });
-                
-                
+
                 std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
                 auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
 
-                
-                dataPop << rep << ";" << t << ";" 
-                        << popSize/count << ";" 
-                        << propOffspringDead/count2 << ";" 
-                        << propDeath/count4 << ";" 
-                        << propDeathExtrinsic/count3 << ";" 
-                        << propDeathMutation/count3 << ";" 
+                dataPop << rep << ";" << t << ";"
+                        << popSize/count << ";"
+                        << propOffspringDead/count2 << ";"
+                        << propDeath/count4 << ";"
+                        << propDeathExtrinsic/count3 << ";"
+                        << propDeathMutation/count3 << ";"
                         << quantiles[1] << ";"
                         << quantiles[2] << ";"
-                        << quantiles[3] << ";" 
-                        << quantiles[0] << ";" 
-                        << quantiles[4] << ";" 
+                        << quantiles[3] << ";"
+                        << quantiles[0] << ";"
+                        << quantiles[4] << ";"
                         << quantilesDamage[1] << ";"
                         << quantilesDamage[2] << ";"
-                        << quantilesDamage[3] << ";" 
-                        << quantilesDamage[0] << ";" 
+                        << quantilesDamage[3] << ";"
+                        << quantilesDamage[0] << ";"
                         << quantilesDamage[4] << std::endl;
 
                 // Save data mutation accumulation
                 int damage(0);
                 while (damage<maxDamageConsidered){
-                    std::vector<double> SurvMutVec = {}; 
+                    std::vector<double> SurvMutVec = {};
                     for (auto iter:population._ListInd) {
-//                         print(iter._survCausedPerMutation[iter._survCausedPerMutation.size()-1]);
-//                         print(iter._survCausedPerMutation[iter._survCausedPerMutation.size()-1]);
                         if(damage<iter._survCausedPerMutation.size()){
                             SurvMutVec.push_back(iter._survCausedPerMutation[damage]);
-                        }else{                          
+                        }else{
                             if(iter._survCausedPerMutation[iter._survCausedPerMutation.size()-1]>1-0.01){
                                 SurvMutVec.push_back(1.0);
                             }else{
@@ -675,31 +479,23 @@ void ReplicateSimulation        (   int carryingCapacity,
 
                     auto quantiles2 = Quantile<double>(SurvMutVec, { 0.025, 0.5, 0.975 });
                     if(mean(SurvMutVec)>1e-20){
-      
-                        dataMutationAccumulation << rep << ";" << t << ";" 
-                                                    << damage << ";" 
-                                                    << quantiles2[0] << ";" 
-                                                    << quantiles2[1] << ";" 
-                                                    << quantiles2[2] << ";" 
+
+                        dataMutationAccumulation << rep << ";" << t << ";"
+                                                    << damage << ";"
+                                                    << quantiles2[0] << ";"
+                                                    << quantiles2[1] << ";"
+                                                    << quantiles2[2] << ";"
                                                     << mean(SurvMutVec) << std::endl;
                     }
                     damage+=rangeEffectDeleteriousMutation;
                 }
                 tCheck+=(Tstep*convertIntoYear);
-                
-            } 
-            
-
-            population.updateNewTimeStep();                        
-
-            population.replaceDeadIndividuals();                       
-
-            
+            }
+            population.updateNewTimeStep();
+            population.replaceDeadIndividuals();
             ++t;
         }
-                        
     }
-    
     dataPop.close();
     dataMutationAccumulation.close();
 }
@@ -709,81 +505,67 @@ void ReplicateSimulation        (   int carryingCapacity,
     ///###### MAIN
 
 int main()
-{   
-   srand ( time(NULL) ); 
-    
+{
+   srand ( time(NULL) );
+
     // Parameters
-    
+
     int carryingCapacity = 500;
     bool densityDependenceSurvival = false;
 
-
     double birthRatePerYear = 1.5;
-    
+
     double alphaMax = 1.0;
     double rateAlphaFecundityYear = 50     /365;
-    
-    double mortRatePerYear = 1.0;  
+
+    double mortRatePerYear = 1.0;
     int maxAgeConsideredYear = 30;                  // in years : typically  10
 
     double convertIntoYear = 12.0;                   // if time steps = months: 12 ; if time steps = days: 365
-    
+
     bool startAtEarlierLifeSpan = true;
     double quantileStart = 0.9;     //0.8
-    
+
     double probDeleteriousMutationPerAge = 2e-3;
     int rangeEffectDeleteriousMutation = 1;        // in months if convertIntoYear 12; in days if convertIntoYear 365
     bool boolReverseMutation = false;
     double ratioReverseMutation = 1;
-    
+
     double effectSurvDeleteriousMutation = 1;
-    
+
     double rateAccumul = 1;
     std::string typeAccumulation = "lin";
-    
+
     // Characteristics sensitivity analysis
 
     int NbRep = 1;
-    
+
     int Tburnin = 2;        // in years ; 2
     int Tmax = 100000;         // in years ; 3e6
     int Tstep = 1000;        // in years ; 2e4
-    
-    std::string Namefile = "Run12somaticMonthRangeMonthAlphaMax1Rate50_NoratioRev_Rep1_maxAge50QuantStart09_Mut2e3Range1K500DdepF_birth15extrMort1lin";
-   
-    // Conversion from year to month
-    
-//     double nbOffspringPerInd = 1-exp(-birthRatePerYear/convertIntoYear);   
-            
 
-    
+    std::string Namefile = "Run12somaticMonthRangeMonthAlphaMax1Rate50_NoratioRev_Rep1_maxAge50QuantStart09_Mut2e3Range1K500DdepF_birth15extrMort1lin";
+
+    // Conversion from year to month
+
     double probSurvExtrinsicMortality = exp(-mortRatePerYear/convertIntoYear);
-    
-    
+
     double convertIntoYearDAY = 365;
     double probSurvExtrinsicMortalityDAY = exp(-mortRatePerYear/convertIntoYearDAY);
     double nbOffspringPerIndDAY = 1-exp(-birthRatePerYear/convertIntoYearDAY);
     double nbOffspringPerInd = nbOffspringPerIndDAY * convertIntoYearDAY/convertIntoYear  / probSurvExtrinsicMortality;
-            
 
-            
-    int maxAgeConsidered = maxAgeConsideredYear*convertIntoYear;      
-    
+    int maxAgeConsidered = maxAgeConsideredYear*convertIntoYear;
+
     double rateAlphaFecundity = rateAlphaFecundityYear / convertIntoYear;
     int maxDamageConsidered(0);
-    maxDamageConsidered = maxAgeConsidered;   
-//     if(typeAccumulation=="lin"){
-//         maxDamageConsidered = (int) (maxAgeConsidered * rateAccumul);        
-//     }else if(typeAccumulation=="exp"){
-//         maxDamageConsidered = (int) (exp(maxAgeConsidered * rateAccumul));
-//     }
-//     print(maxDamageConsidered);
-    
-    // Sensitivity analysis 
-    
+    maxDamageConsidered = maxAgeConsidered;
+
+    // Sensitivity analysis
+
     time_t start, end;
     time(&start);
-    
+
     ReplicateSimulation(            carryingCapacity,
                                     densityDependenceSurvival,
                                     nbOffspringPerInd,
@@ -807,17 +589,17 @@ int main()
                                     Tstep,
                                     Namefile
                            );
-    
+
    // Recording end time.
     time(&end);
-  
+
     // Calculating total time taken by the program.
     double time_taken = double(end - start);
     std::cout << "Time taken by program is : " << std::fixed
          << time_taken << std::setprecision(5);
-    std::cout << " sec " << std::endl;    
+    std::cout << " sec " << std::endl;
 
-    
+
     return 0;
-    
+
 }
