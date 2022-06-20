@@ -532,9 +532,9 @@ int main()
     double ratioReverseMutation = 1;
 
     double effectSurvDeleteriousMutation = 1;
-
-    double rateAccumul = 1;
+    
     std::string typeAccumulation = "lin";
+    double rateAccumul = 1;                 // if _typeAccumulation=="randomlin", rate of accumulation of somatic states
 
     // Characteristics sensitivity analysis
 

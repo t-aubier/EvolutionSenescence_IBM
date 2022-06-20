@@ -11,12 +11,6 @@
 #include <algorithm>
 #include <cstdlib>
 
-// #include <boost/random/uniform_01.hpp>
-// #include <boost/random/mersenne_twister.hpp>
-//
-// std::random_device rd2;
-// boost::random::mt19937 gen2(rd2());
-
 
 //####################################################################
 // Individual Class
@@ -32,6 +26,7 @@ Individual::Individual( const int& indexPopulation,
                         const int& maxDamageConsidered,
                         const double& probSurvExtrinsicMortality,
                         const double& rateAccumul,
+                        const double& convertIntoYear,
                         const std::string& typeAccumulation
                       ){
 
@@ -39,6 +34,7 @@ Individual::Individual( const int& indexPopulation,
     _maxDamageConsidered = maxDamageConsidered;
     _probSurvExtrinsicMortality = probSurvExtrinsicMortality;
     _rateAccumul = rateAccumul;
+    _convertIntoYear = convertIntoYear;
     _typeAccumulation = typeAccumulation;
     _fecundity = 1.0;
 
@@ -108,20 +104,16 @@ void Individual::updateNewTimeStep(double& adjustTerm){
 
 void Individual::getLevelDamage(){
     if(_typeAccumulation=="lin"){
-
-//         _damage = (int) (_age * _rateAccumul);
-
-        double accumulRatePerYear = 10.0;
-        double convertIntoYear = 12.0;                   // if time steps = months: 12 ; if time steps = days: 365
-        double probAccum = 1-exp(-accumulRatePerYear/convertIntoYear);
-        if (randomDouble()<probAccum) {
-            _damage++;
-        }
-
+        _damage = (int) (_age * _rateAccumul);
     }else if(_typeAccumulation=="exp"){
         _damage = (int) (exp(_age * _rateAccumul)-1);
     }else if(_typeAccumulation=="log"){
         _damage = (int) (log(_age * _rateAccumul + 1));
+    }else if(_typeAccumulation=="randomlin"){
+        double probAccum = 1-exp(-_rateAccumul/_convertIntoYear);
+        if (randomDouble()<probAccum) {
+            _damage++;
+        }
     }
 }
 
