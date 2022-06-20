@@ -70,6 +70,7 @@ Population::Population( const int& carryingCapaxity,
                           maxDamageConsidered,
                           probSurvExtrinsicMortality,
                           rateAccumul,
+                          convertIntoYear,
                           typeAccumulation
                         );
 
