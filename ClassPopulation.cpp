@@ -77,7 +77,6 @@ Population::Population( const int& carryingCapaxity,
         _ListInd.push_back(ind);
         _ListLivingInd.push_back(indexPopulation);
         _ListAllInd.push_back(indexPopulation);
-
     }
 }
 
@@ -88,14 +87,10 @@ Population::~Population(){};
     ///###### CLASS METHODS
 
 void Population::updateNewTimeStep(){
-
     // update living state, damage accumulation, and survival probability
-
     if (_densityDependenceSurvival==true && _ListInd.size()<_carryingCapaxity){
+        // define adjustTerm that will cause density-dependent extrinsic mortality
         double adjustTerm = ((double)_ListInd.size()) / ((double) _carryingCapaxity);
-        if(adjustTerm<0.95){
-            adjustTerm = 0.0;
-        }
         for (auto& iter:_ListInd){
             iter.updateNewTimeStep(adjustTerm);
         }
@@ -104,7 +99,6 @@ void Population::updateNewTimeStep(){
             iter.updateNewTimeStep();
         }
     }
-
 }
 
 
@@ -121,11 +115,12 @@ void Population::replaceDeadIndividuals(){
             _ListLivingInd.push_back(iter._indexPopulation);
             _ListIndUpdated.push_back(iter);
 
+            // asexual reproduction and production of offspring
             std::poisson_distribution<int> distribution(_nbOffspringPerInd*iter._fecundity);
             int nbOffspring = distribution(gen2);
 
             for (int nbOff(0); nbOff<nbOffspring; ++nbOff) {
-                _ListIndOfspringIndex.push_back(iter._indexPopulation);  // HERE
+                _ListIndOfspringIndex.push_back(iter._indexPopulation);
             }
 
         }else{
@@ -133,14 +128,12 @@ void Population::replaceDeadIndividuals(){
         }
     }
 
-        // local competition among offspring; and mutation accumulation
+    // local competition among offspring
     double sizePop = _ListLivingInd.size() + _ListIndOfspringIndex.size();
-
     double probSurvOffspring = 0.0;
     if(_carryingCapaxity - (double) _ListLivingInd.size()>0){
         probSurvOffspring = 1.0 / ( 1.0 + ((double) _ListIndOfspringIndex.size() )/((double)  _carryingCapaxity - (double) _ListLivingInd.size() ));
     }
-
     for (auto& index:_ListIndOfspringIndex) {
         if (randomDouble()<probSurvOffspring){
             _ListIndOfspring.push_back(_ListInd[index]);
@@ -154,7 +147,7 @@ void Population::replaceDeadIndividuals(){
             while (age<iter._survCausedPerMutation.size()) {
 
                 if ((_boolReverseMutation==false && iter._nbLethalMutations[age]<1 &&  randomDouble()<_probDeleteriousMutationPerAge) || (_boolReverseMutation==true &&  randomDouble()<_probDeleteriousMutationPerAge)){ // HERE
-
+                    // deleterious mutations
                     for(int age2(0);age2<_rangeEffectDeleteriousMutation;++age2){
                         if(age+age2<iter._survCausedPerMutation.size()){
                             iter._survCausedPerMutation[age+age2] -= _effectSurvDeleteriousMutation;
@@ -168,7 +161,7 @@ void Population::replaceDeadIndividuals(){
                     }
 
                 }else if(_boolReverseMutation==true && iter._nbLethalMutations[age]>0 && randomDouble()<_probDeleteriousMutationPerAge*_ratioReverseMutation){
-
+                    // beneficial 'reverse' mutations
                     for(int age2(0);age2<_rangeEffectDeleteriousMutation;++age2){
                         if(age+age2<iter._survCausedPerMutation.size()-1){
                             iter._nbLethalMutations[age+age2] -= 1.0;
@@ -181,7 +174,7 @@ void Population::replaceDeadIndividuals(){
                         }
                     }
                 }
-
+                // change in fecundity in the case of pleiotropic mutations
                 if(foundLowestAge == false && iter._survCausedPerMutation[age]<1e-30){
                     iter._fecundity = 1.0 + (_alphaMax - 1.0) * exp(-(_rateAlphaFecundity  * age));
                     foundLowestAge = true;
@@ -192,7 +185,6 @@ void Population::replaceDeadIndividuals(){
             _ListIndUpdated.push_back(iter);
     }
 
-
     // update population
     _ListInd = _ListIndUpdated;
     int index2 = 0;
@@ -200,7 +192,6 @@ void Population::replaceDeadIndividuals(){
         iter._indexPopulation=index2;
         ++index2;
     }
-
 }
 
 void Population::shortenMutationVector(bool boolReverseMutation){

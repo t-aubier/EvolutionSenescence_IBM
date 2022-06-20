@@ -67,7 +67,7 @@ public:
 
     ///###### CLASS METHODS
 
-    // we reset the information of the individual (when replaced by a newborn individual)
+    // reset the information of the individual (when replaced by a newborn individual)
     void reset();
 
     // update of the individual information at each time step; including extrinsic and intrinsic mortality

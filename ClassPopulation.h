@@ -72,13 +72,23 @@ public:
 
     ///###### CLASS METHODS
 
+    // update of the individual information at each time step; including extrinsic and intrinsic mortality;
+    // with or without density-dependent extrinsic mortality
     void updateNewTimeStep();
+
+    // replace dead individuals by newborn individuals; include local competition among offspring, deleterious and beneficial mutations,
+    // change in fecundity due to pleiotropy
     void replaceDeadIndividuals();
+
+    // reduce the size of the vector storing mutations, when the overall effects of mutation makes that no individual can reach old ages
     void shortenMutationVector(bool boolReverseMutation);
 
     ///###### ADDITIONAL METHODS
 
+    // change the probability of deleterious mutations
     void setProbDeleteriousMutationPerAge(const double& newProbDeleteriousMutationPerAge);
+
+    // reset the information of the individual (when replaced by a newborn individual)
     void reset();
 
 };
