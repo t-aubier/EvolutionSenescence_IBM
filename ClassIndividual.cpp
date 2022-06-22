@@ -105,10 +105,6 @@ void Individual::updateNewTimeStep(double& adjustTerm){
 void Individual::getLevelDamage(){
     if(_typeAccumulation=="lin"){
         _damage = (int) (_age * _rateAccumul);
-    }else if(_typeAccumulation=="exp"){
-        _damage = (int) (exp(_age * _rateAccumul)-1);
-    }else if(_typeAccumulation=="log"){
-        _damage = (int) (log(_age * _rateAccumul + 1));
     }else if(_typeAccumulation=="randomlin"){
         double probAccum = 1-exp(-_rateAccumul/_convertIntoYear);
         if (randomDouble()<probAccum) {
