@@ -16,10 +16,14 @@
 
     ///###### FUNCTIONS TO FIND QUANTILES
 
+    //##   Compute the quantile from a vector of numerics
+    //     @input  std::vector<T>& inData :  the vector containing the numeric elements
+    //     @input  std::vector<T>& probs  :  the quantiles
+    //     @return std::vector<T>         :  the numerics corresponding to the quantiles
+
 template<typename T> static inline double Lerp(T v0, T v1, T t){
     return (1 - t)*v0 + t*v1;
 }
-
 template<typename T> static inline std::vector<T> Quantile(const std::vector<T>& inData, const std::vector<T>& probs){
     if (inData.empty()){
         return std::vector<T>();
@@ -77,6 +81,8 @@ void ReplicateSimulation        (   int carryingCapacity,
 
     print(Namefile);
 
+    // the files where information will be stored
+
     std::fstream dataPop;
     dataPop.open ("Data/dataPop_"+Namefile+".csv", std::fstream::in | std::fstream::out | std::fstream::trunc);
     dataPop << "Rep;" << "Time;" << "SizePop;" << "PercentOffspringDead;" << "propDeath;" << "propDeathExtrinsic;" << "propDeathMutation;" << "LifeSpan0025;" << "LifeSpan05;" << "LifeSpan0975;" << "LifeSpanMin;" << "LifeSpanMax;" << "Damage0025;" << "Damage05;" << "Damage0975;" << "DamageMin;" << "DamageMax"  << std::endl;
@@ -88,101 +94,6 @@ void ReplicateSimulation        (   int carryingCapacity,
     int indCharacSaved_rep = 0;
 
     for(int rep(0); rep<NbRep; ++rep){
-
-        // we assess the rate of damage accumulation that matches the median damage level when linear accumulation
-        if(typeAccumulation!="lin"){
-
-            int nbInd = 5e5;
-
-            //linear accumulation
-            std::string func = "lin";
-
-            std::vector<int> damageDeathVec = {};
-            int ind(0);
-            int damage;
-            while(ind<nbInd){
-                ++ind;
-                bool dead = false;
-                int age = 0 ;
-                while(dead==false){
-                    if(func=="exp"){
-                        damage = (int) exp(age * rateAccumul)-1;
-                    }else if(func=="lin"){
-                        damage = age;
-                    }
-                    damageDeathVec.push_back(damage);
-
-                    if(randomDouble()>probSurvExtrinsicMortality){
-                        dead = true;
-                    }
-                    age = age+1;
-                }
-            }
-
-            std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
-            auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0.5 });
-            double MedianDamageLevelLinear = quantilesDamage[0];
-
-            rateAccumul = 0;
-            double rateAccumulInterv;
-            if(typeAccumulation=="log"){
-                rateAccumulInterv = 10^200;
-            }else if(typeAccumulation=="exp"){
-                rateAccumulInterv = 0.01;
-            }
-            double MedianDamageLevelLinearNonLinear = 0;
-            double epsilon = 0.5;
-            while(abs(MedianDamageLevelLinearNonLinear-MedianDamageLevelLinear)>epsilon){
-                while(MedianDamageLevelLinearNonLinear<MedianDamageLevelLinear-epsilon){
-
-                    rateAccumul = rateAccumul + rateAccumulInterv;
-
-                    // Here we define the median damage level when deviation from linearity
-
-                    std::string func = typeAccumulation;
-
-                    std::vector<int> damageDeathVec = {};
-                    int ind(0);
-                    int damage;
-                    while(ind<nbInd){
-                        ++ind;
-                        bool dead = false;
-                        int age = 0 ;
-                        while(dead==false){
-                            if(func=="exp"){
-                                damage = (int) exp(age * rateAccumul)-1;
-                            }else if(func=="lin"){
-                                damage = age;
-                            }
-                            damageDeathVec.push_back(damage);
-
-                            if(randomDouble()>probSurvExtrinsicMortality){
-                                dead = true;
-                            }
-                            age = age+1;
-                        }
-                    }
-
-                    std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
-                    auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0.5 });
-                    MedianDamageLevelLinearNonLinear = quantilesDamage[0];
-
-                    print(rateAccumul);
-                    print(MedianDamageLevelLinear);
-                    print(MedianDamageLevelLinearNonLinear);
-                    print(rateAccumulInterv);
-                    print("");
-
-                    if(MedianDamageLevelLinearNonLinear>MedianDamageLevelLinear){
-                        rateAccumul -= rateAccumulInterv;
-                        MedianDamageLevelLinearNonLinear = 0;
-                        rateAccumulInterv = rateAccumulInterv/10;
-                    }
-                }
-            }
-        }
-        print("rateAccumul :");
-        print(rateAccumul);
 
         // population without limit in maxDamageConsidered
         Population population = Population( carryingCapacity,
@@ -510,60 +421,72 @@ int main()
 
     // Parameters
 
-    int carryingCapacity = 500;
-    bool densityDependenceSurvival = false;
+    int carryingCapacity = 500;                     // Carrying capacity
+    bool densityDependenceSurvival = false;         // Whether survival is adjusted when N<CarryingCapacity after recruitment
 
-    double birthRatePerYear = 1.5;
+    double birthRatePerYear = 1.5;                  // Birth rate per year; converted into a number of offspring per time step below
 
-    double alphaMax = 1.0;
-    double rateAlphaFecundityYear = 50     /365;
+    double alphaMax = 1.0;                          // Maximum fecundity when pleiotropy (when mutation expressed at age == 0)
+    double rateAlphaFecundityYear = 50     /365;    // Rate at which fecundity decreases with the age at which intrinsic mortality occurs (called gamma in the manuscript)
 
-    double mortRatePerYear = 1.0;
-    int maxAgeConsideredYear = 30;                  // in years : typically  10
+    double mortRatePerYear = 1.0;                   // Mortality rate per year; converted into a number of offspring per time step below
+    int maxAgeConsideredYear = 30;                  // Maximum age considered (in years); to determine the size of vectors (should be high enough)
 
-    double convertIntoYear = 12.0;                   // if time steps = months: 12 ; if time steps = days: 365
+    double convertIntoYear = 12.0;                  // Discretization of one year into time steps
+                                                    // Depending on the simulation: if time steps = months: 12 ; if time steps = days: 365
+                                                    // Considering that time steps are months instead of days decreases simulation runtime
 
-    bool startAtEarlierLifeSpan = true;
-    double quantileStart = 0.9;     //0.8
+    bool startAtEarlierLifeSpan = true;             // If true, implement a lethal mutation expressed at a late age
+                                                    // It decreases simulation runtime because the first lethal mutation expressed at very late age
+                                                    // take a long time to fixate
+    double quantileStart = 0.9;                     // If startAtEarlierLifeSpan==true, it defines the quantile of lifespan at which the fist lethal mutation is expressed
 
-    double probDeleteriousMutationPerAge = 2e-3;
-    int rangeEffectDeleteriousMutation = 1;        // in months if convertIntoYear 12; in days if convertIntoYear 365
-    bool boolReverseMutation = false;
-    double ratioReverseMutation = 1;
+    double probDeleteriousMutationPerAge = 2e-3;    // Probability of getting a deleterious mutation expressed at a given age
+    int rangeEffectDeleteriousMutation = 1;         // Age at which deleterious mutations can have an effect (if=1: in months if convertIntoYear=12, and in days if convertIntoYear=365)
 
-    double effectSurvDeleteriousMutation = 1;
-    
-    std::string typeAccumulation = "lin";
-    double rateAccumul = 1;                 // if _typeAccumulation=="randomlin", rate of accumulation of somatic states
+    bool boolReverseMutation = false;               // if true, beneficial 'reverse' mutations can occur
+    double ratioReverseMutation = 1;                // if boolReverseMutation==true, proportion of beneficial mutations relative to deleterious mutations
+
+    double effectSurvDeleteriousMutation = 1;       // Survival probability reduced due to the expression of a single deleterious mutation (if ==1, lethal mutation)
+
+    std::string typeAccumulation = "lin";           // Type of accumulation of damage: "lin", "exp", "log", or "randomlin"
+                                                    // "lin" is implemented in most simulations (it reflects the age), "randomlin" is implemented when we consider stochastic
+                                                    // change of somatic state
+
+    double rateAccumul = 1;                         // if _typeAccumulation=="lin", link between somatic state and age (=1)
+                                                    // if _typeAccumulation=="randomlin", rate of accumulation of somatic states (called 'damage' in the script)
+
+
 
     // Characteristics sensitivity analysis
 
-    int NbRep = 1;
+    int NbRep = 1;                                  // Number of replicates
 
-    int Tburnin = 2;        // in years ; 2
-    int Tmax = 100000;         // in years ; 3e6
-    int Tstep = 1000;        // in years ; 2e4
+    int Tburnin = 2;                                // Burn-in period to assess population extinction before mutation accumulations (in years)
+    int Tmax = 100000;                              // Simulation sime (in years) ; 3e6
+    int Tstep = 1000;                               // Time at which information is recoreded (in years) ; 2e4
 
     std::string Namefile = "Run12somaticMonthRangeMonthAlphaMax1Rate50_NoratioRev_Rep1_maxAge50QuantStart09_Mut2e3Range1K500DdepF_birth15extrMort1lin";
 
-    // Conversion from year to month
+    // Conversion from year to month (if each time step = month; if convertIntoYear==12) or to day (if each time step = day; if convertIntoYear==365)
 
     double probSurvExtrinsicMortality = exp(-mortRatePerYear/convertIntoYear);
-
     double convertIntoYearDAY = 365;
     double probSurvExtrinsicMortalityDAY = exp(-mortRatePerYear/convertIntoYearDAY);
     double nbOffspringPerIndDAY = 1-exp(-birthRatePerYear/convertIntoYearDAY);
     double nbOffspringPerInd = nbOffspringPerIndDAY * convertIntoYearDAY/convertIntoYear  / probSurvExtrinsicMortality;
-
     int maxAgeConsidered = maxAgeConsideredYear*convertIntoYear;
-
     double rateAlphaFecundity = rateAlphaFecundityYear / convertIntoYear;
+
+    // From the maximum age considered (in time steps) to the maximum damage considered (equality is assumed given that we account for linear accumulation)
     int maxDamageConsidered(0);
     maxDamageConsidered = maxAgeConsidered;
 
     // Sensitivity analysis
 
     time_t start, end;
+
+    // Recording of start time
     time(&start);
 
     ReplicateSimulation(            carryingCapacity,
@@ -598,7 +521,6 @@ int main()
     std::cout << "Time taken by program is : " << std::fixed
          << time_taken << std::setprecision(5);
     std::cout << " sec " << std::endl;
-
 
     return 0;
 

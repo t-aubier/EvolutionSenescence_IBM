@@ -36,33 +36,34 @@ public:
 
     // True for all individuals
 
-    double _probSurvExtrinsicMortality;              // probability of survival considering only extrinsic mortality
+    double _probSurvExtrinsicMortality;             // Probability of survival considering only extrinsic mortality
 
 
     // Specific to each individual
 
         //change during lifetime
 
-    int _age;                                       // age
-    int _damage;                                    // damage
-    double _rateAccumul;                            // rate of damage accumulation
-    double _convertIntoYear;                        // factor to convert to year
-    std::string _typeAccumulation;                  // type of accumulation of damage: "lin", "exp", "log", or "randomlin"
+    int _age;                                       // Age
+    int _damage;                                    // Damage
+    double _rateAccumul;                            // Rate of damage accumulation
+    double _convertIntoYear;                        // Factor to convert to year
+    std::string _typeAccumulation;                  // Type of accumulation of damage: "lin", "exp", "log", or "randomlin"
                                                     // "lin" is implemented in most simulations (it reflects the age), "randomlin" is implemented when we consider stochastic
                                                     // change of somatic state
 
-    bool _livingState;                              // true: living; false: dead
-    int _causeDeath;                                // cause of death: -1: not dead; 0: extrinsic mortality; 1: intrinsic mortality
+    bool _livingState;                              // If true: living; if false: dead
+    int _causeDeath;                                // Cause of death: -1: not dead; 0: extrinsic mortality; 1: intrinsic mortality
 
-    std::vector<double> _survCausedPerMutation;     // probability of survival per damage level caused by the mutations
-    std::vector<double> _nbLethalMutations;         // number of damage-dependent mutations
+    std::vector<double> _survCausedPerMutation;     // Probability of survival per damage level caused by the mutations
+    std::vector<double> _nbLethalMutations;         // Number of damage-dependent mutations
 
-    int _maxDamageConsidered;                       // max damage considered;
+    int _maxDamageConsidered;                       // Maximum damage considered (maximum age in year if _typeAccumulation=="lin");
+                                                    // to determine the size of vectors (should be high enough)
 
         //constant during lifetime
 
-    int _indexPopulation;                           // index of the individual in the population
-    double _fecundity;                              // fecundity; accounts for pleiotropy
+    int _indexPopulation;                           // Index of the individual in the population
+    double _fecundity;                              // Fecundity; accounts for pleiotropy
 
 
     ///###### CLASS METHODS

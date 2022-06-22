@@ -47,23 +47,28 @@ public:
     int _carryingCapaxity;                              // Carrying capacity
     bool _densityDependenceSurvival;                    // Whether survival is adjusted when N<CarryingCapacity after recruitment
     double _nbOffspringPerInd;                          // Nb of offspring per individuals
-    double _alphaMax;                                   // Maximum pleiotropic effect (when mutation expressed at damage == 0)
-    double _rateAlphaFecundity;                         // rate of pleiotropy
-    int _maxDamageConsidered;                           // max damage considered;
+    double _alphaMax;                                   // Maximum fecundity when pleiotropy (when mutation expressed at age == 0)
+    double _rateAlphaFecundity;                         // Rate at which fecundity decreases with the age at which intrinsic mortality occurs (called gamma in the manuscript)
+    int _maxDamageConsidered;                           // Maximum damage considered (correspond to maximum age in years);
+                                                        // to determine the size of vectors (should be high enough)
 
-    double _probDeleteriousMutationPerAge;              // probability of getting the deleterious mutation
-    double _ratioReverseMutation;                       // proportion of beneficial reverse mutations relative to deleterious mutations
+    double _probDeleteriousMutationPerAge;              // Probability of getting a deleterious mutation expressed at a given age
 
-    double _convertIntoYear;                               // factor to convert to year
-    int _rangeEffectDeleteriousMutation;                // discretization of the effect of the deleterious mutation
-    bool _boolReverseMutation;                          // whether lethal mutation can be removed or not
-    double _effectSurvDeleteriousMutation;              // effect of each deleterious mutation on survival
+    double _convertIntoYear;                            // Depending on the simulation: if time steps = months: 12 ; if time steps = days: 365
+                                                        // Considering that time steps are months instead of days decreases simulation runtime
+
+    int _rangeEffectDeleteriousMutation;                // Age at which deleterious mutations can have an effect (if=1: in months if convertIntoYear=12, and in days if convertIntoYear=365)
+
+    bool _boolReverseMutation;                          // If true, beneficial 'reverse' mutations can occur
+    double _ratioReverseMutation;                       // If boolReverseMutation==true, proportion of beneficial mutations relative to deleterious mutations
+
+    double _effectSurvDeleteriousMutation;              // Survival probability reduced due to the expression of a single deleterious mutation (if ==1, lethal mutation)
 
 
     std::vector<Individual> _ListInd;                   // Population of individuals
-    std::vector<int> _ListLivingInd;                    // list of index of parental Ind
-    std::vector<int> _ListDeadInd;                      // list of index of dead Ind
-    std::vector<int> _ListAllInd;                       // list of all individuals
+    std::vector<int> _ListLivingInd;                    // List of index of parental individuals
+    std::vector<int> _ListDeadInd;                      // List of index of dead individuals
+    std::vector<int> _ListAllInd;                       // List of all individuals
 
     std::vector<Individual> _ListIndUpdated;            // Population of individuals updated after replacement
     std::vector<Individual> _ListIndOfspring;           // Population of offspring individuals
