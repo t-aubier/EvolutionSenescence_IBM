@@ -53,7 +53,7 @@ template<typename T> static inline std::vector<T> Quantile(const std::vector<T>&
     return quantiles;
 }
 
-    ///###### SENSITIVITY ANALYSIS -- PROBABILITY OF INVASION OF DELETERIOUS MUTATIONS
+    ///###### SENSITIVITY ANALYSIS
 
 void ReplicateSimulation        (   int carryingCapacity,
                                     bool densityDependenceSurvival,
