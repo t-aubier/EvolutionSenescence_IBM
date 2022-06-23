@@ -174,7 +174,7 @@ void ReplicateSimulation        (   int carryingCapacity,
                 count+=1.0;
             }
         }
-        population = populationSave;        // We consider the population after the burn-in phase
+        population = populationSave;        // We consider the population as it was before the analysis
 
         // we measure the different quantiles (age of death, and level of damage, i.e., somatic state, at death)
         std::vector<double> ageDeathVecDouble(ageDeathVec.begin(), ageDeathVec.end());
