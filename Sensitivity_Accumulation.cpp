@@ -76,21 +76,26 @@ void SensitivityAnalysis        (   int carryingCapacity,
                                     std::string Namefile
                            ){
 
+    // We initialize the files where information will be stored
+
     std::fstream dataSensitivity;
     dataSensitivity.open ("Data/dataSensitivity_"+Namefile+".csv", std::fstream::in | std::fstream::out | std::fstream::trunc);
     dataSensitivity << "BirthRatePerYear;" << "MortRatePerYear;" << "RateAccumul;" << "Time;" << "SizePop;"  << "ExtStatus;"  << "PercentOffspringDead;" << "propDeath;" << "propDeathExtrinsic;" << "propDeathMutation;" << "LifeSpan0025;" << "LifeSpan05;" << "LifeSpan0975;" << "LifeSpanMin;" << "LifeSpanMax;" << "Damage0025;" << "Damage05;" << "Damage0975;" << "DamageMin;" << "DamageMax"  << std::endl;
 
-    for (auto& mortRatePerYear:vecMortRatePerYear) {
+    for (auto& mortRatePerYear:vecMortRatePerYear) {        // We loop over the different mortality rates tested
 
+        // We convert the rate into a probability per time step
         double probSurvExtrinsicMortality = exp(-mortRatePerYear/convertIntoYear);
 
-        for (auto& birthRatePerYear:vecBirthRatePerYear) {
+        for (auto& birthRatePerYear:vecBirthRatePerYear) {  // We loop over the different birth rates tested
+
+            // We convert the rate into a probability per time step
             double convertIntoYearDAY = 365;
             double probSurvExtrinsicMortalityDAY = exp(-mortRatePerYear/convertIntoYearDAY);
             double nbOffspringPerIndDAY = 1-exp(-birthRatePerYear/convertIntoYearDAY);
             double nbOffspringPerInd = nbOffspringPerIndDAY * convertIntoYearDAY/convertIntoYear  / probSurvExtrinsicMortality;
 
-            // population without limit in maxDamageConsidered
+            // We initialize the population
             Population population = Population( carryingCapacity,
                                                 densityDependenceSurvival,
                                                 nbOffspringPerInd,
@@ -108,45 +113,44 @@ void SensitivityAnalysis        (   int carryingCapacity,
                                                 effectSurvDeleteriousMutation
                                             );
 
-            // burn in phase
+            // We run the burn-in phase
             bool ExtinctionPop = false;
             int t(0);
             while(t<Tburnin*convertIntoYear+1 && ExtinctionPop == false) {
                 if(population._ListInd.size()==0){
                     ExtinctionPop = true;
                 }else{
-                    population.updateNewTimeStep();
-                    population.replaceDeadIndividuals();
+                    population.updateNewTimeStep();             // step 1 at each time step
+                    population.replaceDeadIndividuals();        // step 2 at each time step
                 }
                 ++t;
             }
 
-            if(ExtinctionPop==true){
+            if(ExtinctionPop==true){            // We record information if the population gets extinct even without mutation accumulation
 
                 dataSensitivity << birthRatePerYear << ";"
-                        << mortRatePerYear << ";"
-                        << "NA" << ";"
-                        << t << ";"
-                        << "NA" << ";"
-                        << "ini ext" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << ";"
-                        << "NA" << std::endl;
-            }else{
+                                << mortRatePerYear << ";"
+                                << "NA" << ";"
+                                << t << ";"
+                                << "NA" << ";"
+                                << "ini ext" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << ";"
+                                << "NA" << std::endl;
+            }else{                              // Else we record information at t = 0, after the burn-in phase
                 t = 0;
 
-                // Save data pop at t=0
                 Population populationSave = population;
                 std::vector<int> ageDeathVec = {};
                 std::vector<int> damageDeathVec = {};
@@ -160,13 +164,15 @@ void SensitivityAnalysis        (   int carryingCapacity,
                 double propDeathExtrinsic(0.0);
                 double propDeathMutation(0.0);
                 double propDeath(0.0);
-                for (int rep2(0); rep2<10; ++rep2){
-                    population = populationSave;
+                for (int rep2(0); rep2<10; ++rep2){         // we 10 simulations lasting 1,000 generation to calculate mean values
+                    population = populationSave;            // we consider the population after the burn-in phase
                     for (int t(0);t<1e3;++t) {
 
-                        population.updateNewTimeStep();
+                        population.updateNewTimeStep();     // step 1 at each time step
 
-                        // life span
+
+                        // We measure the number of individuals, of dead individuals
+                        // (those dying of extrinsic mortality and those dying from intrinsic mortality)
                         for (auto iter:population._ListInd) {
                             count4+=1.0;
                             if(iter._livingState==false){
@@ -182,12 +188,13 @@ void SensitivityAnalysis        (   int carryingCapacity,
                             }
                         }
 
-                        population.replaceDeadIndividuals();
+                        population.replaceDeadIndividuals();        // step 2 at each time step
 
-                        // pop size
+                        // We measure population size (we consider the mean value later)
                         popSize += (double) population._ListInd.size();
 
-                        // prop offspring
+
+                        // We measure the proportion of offspring that die before reaching sexual maturity
                         if(population._ListIndOfspringIndex.size()>0){
                             propOffspringDead += ((double) population._ListIndOfspringIndex.size() - ((double) population._ListInd.size() - population._ListLivingInd.size())) / ((double) population._ListIndOfspringIndex.size()) ;
                             count2+=1.0;
@@ -196,17 +203,17 @@ void SensitivityAnalysis        (   int carryingCapacity,
                     }
 
                 }
-                population = populationSave;
+                population = populationSave;                        // We consider the population after the burn-in phase
 
+                // we measure the different quantiles (age of death, and level of damage, i.e., somatic state, at death)
                 std::vector<double> ageDeathVecDouble(ageDeathVec.begin(), ageDeathVec.end());
                 auto quantiles = Quantile<double>(ageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
-
                 std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
                 auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
 
+                // In simulations were startAtEarlierLifeSpan==true, we implement a first lethal mutation and we thus re-initialize the population
                 if(startAtEarlierLifeSpan==true){
-                    // get median lifespan
-
+                    // Age at which the first lethal mutation is expressed (defined by quantileStart)
                     int newMaxDamageConsidered = (int) (round(quantilesDamage[5])+1);
 
                     // population with limit in maxAgeConsidered
@@ -232,8 +239,8 @@ void SensitivityAnalysis        (   int carryingCapacity,
                         if(population._ListInd.size()==0){
                             ExtinctionPop = true;
                         }else{
-                            population.updateNewTimeStep();
-                            population.replaceDeadIndividuals();
+                            population.updateNewTimeStep();             // step 1 at each time step
+                            population.replaceDeadIndividuals();        // step 2 at each time step
                         }
                         ++t2;
                     }
@@ -242,26 +249,29 @@ void SensitivityAnalysis        (   int carryingCapacity,
                         population = populationSave;
                     }
                 }
-                // add probability to have a deleterious mutation
+
+                // We consider a non-zero probability to have a deleterious mutation
                 population.setProbDeleteriousMutationPerAge(probDeleteriousMutationPerAge);
             }
 
-            // actual simulation
+            // We run the actual simulation until all generations are considered or until population extinction
             bool popGettingExtinct = false;
             ++t;
             while(t<Tmax*convertIntoYear+1 && ExtinctionPop == false) {
                 if(population._ListInd.size()==0){
                     ExtinctionPop = true;
                 }else{
+                    // To speed-up the simulation, we consider less and less age at which mutations can be expressed (once no individual reach this age)
                     if(t% ((int) 1e4)==0){
                         population.shortenMutationVector(boolReverseMutation);
                     }
 
+                    // We record information when the population gets clost to extinction
                     if(((double) population._ListInd.size())/((double) carryingCapacity)<0.1 && popGettingExtinct==false){
                         popGettingExtinct=true;
                         ExtinctionPop = true;
 
-                        // Save data pop
+                        // We save data at the population level
                         Population populationSave = population;
                         std::vector<int> ageDeathVec = {};
                         std::vector<int> damageDeathVec = {};
@@ -276,13 +286,15 @@ void SensitivityAnalysis        (   int carryingCapacity,
                         double propDeathMutation(0.0);
                         double propDeath(0.0);
 
-                        for (int rep2(0); rep2<10; ++rep2){
-                            population = populationSave;
+                        for (int rep2(0); rep2<10; ++rep2){         // we 10 simulations lasting 1,000 generation to calculate mean values
+                            population = populationSave;            // we consider each time the same population
                             for (int t(0);t<1e3;++t) {
 
-                                population.updateNewTimeStep();
+                                population.updateNewTimeStep();     // step 1 at each time step
 
-                                // life span
+
+                                // We measure the number of individuals, of dead individuals
+                                // (those dying of extrinsic mortality and those dying from intrinsic mortality)
                                 for (auto iter:population._ListInd) {
                                     count4+=1.0;
                                     if(iter._livingState==false){
@@ -290,20 +302,20 @@ void SensitivityAnalysis        (   int carryingCapacity,
                                         count3+=1.0;
                                         ageDeathVec.push_back(iter._age);
                                         damageDeathVec.push_back(iter._damage);
-                                        if(iter._causeDeath==0){            // death extrinsic mortality
+                                        if(iter._causeDeath==0){
                                             propDeathExtrinsic+=1.0;
-                                        }else if(iter._causeDeath==1){      // death mutation
+                                        }else if(iter._causeDeath==1){
                                             propDeathMutation+=1.0;
                                         }
                                     }
                                 }
 
-                                population.replaceDeadIndividuals();
+                                population.replaceDeadIndividuals();    // step 2 at each time step
 
-                                // pop size
+                                // We measure population size (we consider the mean value later)
                                 popSize += (double) population._ListInd.size();
 
-                                // prop offspring
+                                // We measure the proportion of offspring that die before reaching sexual maturity
                                 if(population._ListIndOfspringIndex.size()>0){
                                     propOffspringDead += ((double) population._ListIndOfspringIndex.size() - ((double) population._ListInd.size() - population._ListLivingInd.size())) / ((double) population._ListIndOfspringIndex.size()) ;
                                     count2+=1.0;
@@ -313,45 +325,47 @@ void SensitivityAnalysis        (   int carryingCapacity,
                             }
 
                         }
-                        population = populationSave;
+                        population = populationSave;    // We consider the population as it was before the analysis
 
+                        // we measure the different quantiles (age of death, and level of damage, i.e., somatic state, at death)
                         std::vector<double> ageDeathVecDouble(ageDeathVec.begin(), ageDeathVec.end());
                         auto quantiles = Quantile<double>(ageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1  });
-
-
                         std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
                         auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1  });
 
+                        // We record the information at the population level
                         dataSensitivity << birthRatePerYear << ";"
-                                << mortRatePerYear << ";"
-                                << rateAccumul << ";"
-                                << t << ";"
-                                << popSize/count << ";"
-                                << "ext" << ";"
-                                << propOffspringDead/count2 << ";"
-                                << propDeath/count4 << ";"
-                                << propDeathExtrinsic/count3 << ";"
-                                << propDeathMutation/count3 << ";"
-                                << quantiles[1] << ";"
-                                << quantiles[2] << ";"
-                                << quantiles[3] << ";"
-                                << quantiles[0] << ";"
-                                << quantiles[4] << ";"
-                                << quantilesDamage[1] << ";"
-                                << quantilesDamage[2] << ";"
-                                << quantilesDamage[3] << ";"
-                                << quantilesDamage[0] << ";"
-                                << quantilesDamage[4] << std::endl;
+                                        << mortRatePerYear << ";"
+                                        << rateAccumul << ";"
+                                        << t << ";"
+                                        << popSize/count << ";"
+                                        << "ext" << ";"
+                                        << propOffspringDead/count2 << ";"
+                                        << propDeath/count4 << ";"
+                                        << propDeathExtrinsic/count3 << ";"
+                                        << propDeathMutation/count3 << ";"
+                                        << quantiles[1] << ";"
+                                        << quantiles[2] << ";"
+                                        << quantiles[3] << ";"
+                                        << quantiles[0] << ";"
+                                        << quantiles[4] << ";"
+                                        << quantilesDamage[1] << ";"
+                                        << quantilesDamage[2] << ";"
+                                        << quantilesDamage[3] << ";"
+                                        << quantilesDamage[0] << ";"
+                                        << quantilesDamage[4] << std::endl;
                     }
-                    population.updateNewTimeStep();
-                    population.replaceDeadIndividuals();
+
+                    population.updateNewTimeStep();         // step 1 at each time step
+                    population.replaceDeadIndividuals();    // step 2 at each time step
                 }
                 ++t;
             }
 
+            // We also record information at the end of the simulation
             if(ExtinctionPop == false){
 
-                // Save data pop
+                // Below all information is saved as before; see comments in the portion of the code above
                 Population populationSave = population;
                 std::vector<int> ageDeathVec = {};
                 std::vector<int> damageDeathVec = {};
@@ -412,28 +426,29 @@ void SensitivityAnalysis        (   int carryingCapacity,
                 auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1  });
 
                 dataSensitivity << birthRatePerYear << ";"
-                        << mortRatePerYear << ";"
-                        << rateAccumul << ";"
-                        << t << ";"
-                        << popSize/count << ";"
-                        << "no ext" << ";"
-                        << propOffspringDead/count2 << ";"
-                        << propDeath/count4 << ";"
-                        << propDeathExtrinsic/count3 << ";"
-                        << propDeathMutation/count3 << ";"
-                        << quantiles[1] << ";"
-                        << quantiles[2] << ";"
-                        << quantiles[3] << ";"
-                        << quantiles[0] << ";"
-                        << quantiles[4] << ";"
-                        << quantilesDamage[1] << ";"
-                        << quantilesDamage[2] << ";"
-                        << quantilesDamage[3] << ";"
-                        << quantilesDamage[0] << ";"
-                        << quantilesDamage[4] << std::endl;
+                                << mortRatePerYear << ";"
+                                << rateAccumul << ";"
+                                << t << ";"
+                                << popSize/count << ";"
+                                << "no ext" << ";"
+                                << propOffspringDead/count2 << ";"
+                                << propDeath/count4 << ";"
+                                << propDeathExtrinsic/count3 << ";"
+                                << propDeathMutation/count3 << ";"
+                                << quantiles[1] << ";"
+                                << quantiles[2] << ";"
+                                << quantiles[3] << ";"
+                                << quantiles[0] << ";"
+                                << quantiles[4] << ";"
+                                << quantilesDamage[1] << ";"
+                                << quantilesDamage[2] << ";"
+                                << quantilesDamage[3] << ";"
+                                << quantilesDamage[0] << ";"
+                                << quantilesDamage[4] << std::endl;
             }
         }
     }
+    // We close the data set
     dataSensitivity.close();
 }
 

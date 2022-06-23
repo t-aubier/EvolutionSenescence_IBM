@@ -81,7 +81,7 @@ void ReplicateSimulation        (   int carryingCapacity,
 
     print(Namefile);
 
-    // the files where information will be stored
+    // We initialize the files where information will be stored
 
     std::fstream dataPop;
     dataPop.open ("Data/dataPop_"+Namefile+".csv", std::fstream::in | std::fstream::out | std::fstream::trunc);
@@ -93,9 +93,11 @@ void ReplicateSimulation        (   int carryingCapacity,
 
     int indCharacSaved_rep = 0;
 
+    // We loop over replicates
+
     for(int rep(0); rep<NbRep; ++rep){
 
-        // population without limit in maxDamageConsidered
+        // We initialize the population
         Population population = Population( carryingCapacity,
                                             densityDependenceSurvival,
                                             nbOffspringPerInd,
@@ -113,16 +115,16 @@ void ReplicateSimulation        (   int carryingCapacity,
                                             effectSurvDeleteriousMutation
                                         );
 
-        // burn in phase
+        // We run the burn-in phase
         for (int t(0);t<Tburnin*convertIntoYear;++t) {
-            population.updateNewTimeStep();
-            population.replaceDeadIndividuals();
+            population.updateNewTimeStep();             // step 1 at each time step
+            population.replaceDeadIndividuals();        // step 2 at each time step
         }
 
         int t = 0;
         print(t);
 
-        // Save data pop at t=0
+        // We save data at the population level at t=0
         Population populationSave = population;
         std::vector<int> ageDeathVec = {};
         std::vector<int> damageDeathVec = {};
@@ -136,13 +138,14 @@ void ReplicateSimulation        (   int carryingCapacity,
         double propDeathExtrinsic(0.0);
         double propDeathMutation(0.0);
         double propDeath(0.0);
-        for (int rep2(0); rep2<10; ++rep2){
-            population = populationSave;
+        for (int rep2(0); rep2<10; ++rep2){  // we 10 simulations lasting 1,000 generation to calculate mean values
+            population = populationSave;     // we consider the population after the burn-in phase
             for (int t(0);t<1e3;++t) {
 
-                population.updateNewTimeStep();
+                population.updateNewTimeStep();         // step 1 at each time step
 
-                // life span
+                // We measure the number of individuals, of dead individuals
+                // (those dying of extrinsic mortality and those dying from intrinsic mortality)
                 for (auto iter:population._ListInd) {
                     count4+=1.0;
                     if(iter._livingState==false){
@@ -158,12 +161,12 @@ void ReplicateSimulation        (   int carryingCapacity,
                     }
                 }
 
-                population.replaceDeadIndividuals();
+                population.replaceDeadIndividuals();    // step 2 at each time step
 
-                // pop size
+                // We measure population size (we consider the mean value later)
                 popSize += (double) population._ListInd.size();
 
-                // prop offspring
+                // We measure the proportion of offspring that die before reaching sexual maturity
                 if(population._ListIndOfspringIndex.size()>0){
                     propOffspringDead += ((double) population._ListIndOfspringIndex.size() - ((double) population._ListInd.size() - population._ListLivingInd.size())) / ((double) population._ListIndOfspringIndex.size()) ;
                     count2+=1.0;
@@ -171,14 +174,15 @@ void ReplicateSimulation        (   int carryingCapacity,
                 count+=1.0;
             }
         }
-        population = populationSave;
+        population = populationSave;        // We consider the population after the burn-in phase
 
+        // we measure the different quantiles (age of death, and level of damage, i.e., somatic state, at death)
         std::vector<double> ageDeathVecDouble(ageDeathVec.begin(), ageDeathVec.end());
         auto quantiles = Quantile<double>(ageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
-
         std::vector<double> damageDeathVecDouble(damageDeathVec.begin(), damageDeathVec.end());
         auto quantilesDamage = Quantile<double>(damageDeathVecDouble, { 0, 0.025, 0.5, 0.975, 1, quantileStart  });
 
+        // We record the information at the population level
         dataPop << rep << ";" << t << ";"
                 << popSize/count << ";"
                 << propOffspringDead/count2 << ";"
@@ -196,8 +200,8 @@ void ReplicateSimulation        (   int carryingCapacity,
                 << quantilesDamage[0] << ";"
                 << quantilesDamage[4] << std::endl;
 
-        // Save data mutation accumulation
-
+        // We save the information on the accumulation of mutations
+        // Probability of survival at each age (without considering extrinsic mortality)
         int damage(0);
         while (damage<maxDamageConsidered){
             std::vector<double> SurvMutVec = {};
@@ -212,7 +216,6 @@ void ReplicateSimulation        (   int carryingCapacity,
                     }
                 }
             }
-
             auto quantiles2 = Quantile<double>(SurvMutVec, { 0.025, 0.5, 0.975 });
             if(mean(SurvMutVec)>1e-20){
                 dataMutationAccumulation << rep << ";" << t << ";"
@@ -224,11 +227,13 @@ void ReplicateSimulation        (   int carryingCapacity,
             }
             damage+=rangeEffectDeleteriousMutation;
         }
+
+        // Time at which we record information
         int tCheck=(Tstep*convertIntoYear);
 
+        // In simulations were startAtEarlierLifeSpan==true, we implement a first lethal mutation and we thus re-initialize the population
         if(startAtEarlierLifeSpan==true){
-            // get median lifespan
-
+            // Age at which the first lethal mutation is expressed (defined by quantileStart)
             int newMaxDamageConsidered = (int) (round(quantilesDamage[5])+1);
 
             // population with limit in maxDamageConsidered
@@ -250,25 +255,27 @@ void ReplicateSimulation        (   int carryingCapacity,
                                    );
             // burn in phase
             for (int t(0);t<Tburnin*convertIntoYear;++t) {
-                population.updateNewTimeStep();
-                population.replaceDeadIndividuals();
+                population.updateNewTimeStep();         // step 1 at each time step
+                population.replaceDeadIndividuals();    // step 2 at each time step
             }
 
         }
 
-        // add probability to have a deleterious mutation
+        // We consider a non-zero probability to have a deleterious mutation
         population.setProbDeleteriousMutationPerAge(probDeleteriousMutationPerAge);
 
-        // actual simulation
+        // We run the actual simulation until all generations are considered or until population extinction
         bool ExtinctionPop = false;
         bool popGettingExtinct = false;
         ++t;
         while(t<Tmax*convertIntoYear+1 && ExtinctionPop == false) {
 
+            // To speed-up the simulation, we consider less and less age at which mutations can be expressed (once no individual reach this age)
             if(t% ((int) 1e4)==0){
                 population.shortenMutationVector(boolReverseMutation);
             }
 
+            // We record information when the population gets extinct
             if(population._ListInd.size()==0){
 
                 std::cout << "EXTINCTION AT T = " <<  t<< std::endl;
@@ -290,13 +297,14 @@ void ReplicateSimulation        (   int carryingCapacity,
                         << "NA" << std::endl;
                 ExtinctionPop = true;
 
+            // We also record information when the population gets close to extinction or every tCheck generations
             }else if((((double) population._ListInd.size())/((double) carryingCapacity)<0.1 && popGettingExtinct==false) || t==tCheck){
                 if(((double) population._ListInd.size())/((double) carryingCapacity)<0.1){
                     popGettingExtinct=true;
                 }
                 print(t);
 
-                // Save data pop
+                // Below all information is saved as before; see comments in the portion of the code above
                 Population populationSave = population;
                 std::vector<int> ageDeathVec = {};
                 std::vector<int> damageDeathVec = {};
@@ -314,9 +322,7 @@ void ReplicateSimulation        (   int carryingCapacity,
                 for (int rep2(0); rep2<10; ++rep2){
                     population = populationSave;
                     for (int t(0);t<1e3;++t) {
-
                         population.updateNewTimeStep();
-
                         // life span
                         for (auto iter:population._ListInd) {
                             count4+=1.0;
@@ -325,9 +331,9 @@ void ReplicateSimulation        (   int carryingCapacity,
                                 count3+=1.0;
                                 ageDeathVec.push_back(iter._age);
                                 damageDeathVec.push_back(iter._damage);
-                                if(iter._causeDeath==0){            // death extrinsic mortality
+                                if(iter._causeDeath==0){
                                     propDeathExtrinsic+=1.0;
-                                }else if(iter._causeDeath==1){      // death mutation
+                                }else if(iter._causeDeath==1){
                                     propDeathMutation+=1.0;
                                 }
                             }
@@ -335,10 +341,8 @@ void ReplicateSimulation        (   int carryingCapacity,
 
                         population.replaceDeadIndividuals();
 
-                        // pop size
                         popSize += (double) population._ListInd.size();
 
-                        // prop offspring
                         if(population._ListIndOfspringIndex.size()>0){
                             propOffspringDead += ((double) population._ListIndOfspringIndex.size() - ((double) population._ListInd.size() - population._ListLivingInd.size())) / ((double) population._ListIndOfspringIndex.size()) ;
                             count2+=1.0;
@@ -372,7 +376,6 @@ void ReplicateSimulation        (   int carryingCapacity,
                         << quantilesDamage[0] << ";"
                         << quantilesDamage[4] << std::endl;
 
-                // Save data mutation accumulation
                 int damage(0);
                 while (damage<maxDamageConsidered){
                     std::vector<double> SurvMutVec = {};
@@ -407,6 +410,8 @@ void ReplicateSimulation        (   int carryingCapacity,
             ++t;
         }
     }
+
+    // We close the data sets
     dataPop.close();
     dataMutationAccumulation.close();
 }
