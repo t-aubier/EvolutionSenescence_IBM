@@ -92,9 +92,9 @@ In the folder "AnalysisR", the R script to draw graphs resulting from the simula
 
 * "Function_Pleiotropy.R":			                       Plot the factor change in fecundity depending on the age at which intrinsic mortality occurs (Figure B1 in Appendix B)
 
-* "Plot_AccumulationMutations_AnalyticalDerivations.R":     Plot the accumulation of lethal mutations and the maximum lifespan for different grains of age dependence of mutation expression (Figures 1 and 2) 
+* "Plot_AccumulationMutations_AnalyticalDerivations.R":     Plot the accumulation of lethal mutations and the maximum lifespan for different grains of age dependence of mutation expression (Figures 1 and 2)
 
-* "SensitivityAnalysis.R":                                  Plot figures describing the outcome of multiple simulations (like in Fig. 4); obtained using 'SimulationNetwork.cpp'
+* "Plot_SingleSimulation.R":                                  Plot figures describing the outcome of single simulations (like in Figs. B4 and B5 in Appendix B); obtained using 'Simulation_Accumulation.cpp'
 
 * "AnalysisMutant.R":                                       Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'AnalysisMutant.cpp'
 

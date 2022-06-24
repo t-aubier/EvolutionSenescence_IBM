@@ -444,7 +444,7 @@ int main()
     bool startAtEarlierLifeSpan = true;             // If true, implement a lethal mutation expressed at a late age
                                                     // It decreases simulation runtime because the first lethal mutation expressed at very late age
                                                     // take a long time to fixate
-    double quantileStart = 0.9;                     // If startAtEarlierLifeSpan==true, it defines the quantile of lifespan at which the fist lethal mutation is expressed
+    double quantileStart = 0.8;                     // If startAtEarlierLifeSpan==true, it defines the quantile of lifespan at which the fist lethal mutation is expressed
 
     double probDeleteriousMutationPerAge = 2e-3;    // Probability of getting a deleterious mutation expressed at a given age
     int rangeEffectDeleteriousMutation = 1;         // Age at which deleterious mutations can have an effect (if=1: in months if convertIntoYear=12, and in days if convertIntoYear=365)
@@ -467,11 +467,11 @@ int main()
 
     int NbRep = 1;                                  // Number of replicates
 
-    int Tburnin = 2;                                // Burn-in period to assess population extinction before mutation accumulations (in years)
+    int Tburnin = 2e3;                              // Burn-in period to assess population extinction before mutation accumulations (in years)
     int Tmax = 1e5;                                 // Simulation sime (in years)
-    int Tstep = 5e3;                                // Time at which information is recoreded (in years)
+    int Tstep = 1e3;                                // Time at which information is recoreded (in years)
 
-    std::string Namefile = "test_simulation";
+    std::string Namefile = "example_simulation";
 
     // Conversion from year to month (if each time step = month; if convertIntoYear==12) or to day (if each time step = day; if convertIntoYear==365)
 
