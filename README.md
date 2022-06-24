@@ -20,157 +20,104 @@
 
 
 <!-- ABOUT THE PROJECT -->
+
+# Code from: Deleterious mutation accumulation and the evolution of senescence
+
 ## General Information
 
-* Title of Code: Code from: Deleterious mutation accumulation and the evolution of senescence
 * Author Information:
 
-	Corresponding Investigator
-		Name: Dr Thomas G. Aubier
-		Institution: University of North Carolina at Chapel Hill, USA
-		Email: thomas.aubier@normalesup.org
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Corresponding Investigator:
 
-        	Co-investigator 1
-        		Name: Dr Matthias Galipaud
-        		Institution: University of Zürich, Switzerland
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: Dr. Thomas G. Aubier
 
-*  Date of code development: 2020-2022
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Institution: University of North Carolina at Chapel Hill, USA
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email: thomas.aubier@normalesup.org
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Co-investigator:
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: Dr. Matthias Galipaud
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Institution: University of Zürich, Switzerland
+
+<br />
+
+* Date of code development: 2020-2022
+<br />
+
 * Funding sources that supported code development: Swiss National Science Foundation, and National Science Foundation
+<br />
+
 * Recommended citation for this code: Aubier and Galipaud (2022), Code from: Deleterious mutation accumulation and the evolution of senescence, GitHub repository, https://github.com/t-aubier/EvolutionSenescence_IBM
 
 
-<!-- GETTING STARTED -->
-## Getting Started
+## System Requirements
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Simulations are run using C++ (compiler g++ 7.5.0).
 
-### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+## Installation guide
 
-### Installation
+Install C++: https://code.visualstudio.com/docs/languages/cpp
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+Also install the Boost C++ Libraries development files.
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+On linux: 
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   sudo apt-get install libboost-all-dev
    ```
-3. Install NPM packages
+
+Overall installation time is short: < 5 min
+
+## Script description
+
+Oriented-based programming in C++ with modeling of two different classes 'Population' and 'Individual':
+
+"ClassPopulation.cpp" and "ClassPopulation.h": script defining the class 'Population' referring to a population of individuals; see the header files "ClassPopulation.h" for descriptions of the variables and the functions.
+
+"ClassIndividual.cpp" and "ClassIndividual.h": script defining the class 'ClassIndividual' referring a single individual; see the header files "ClassIndividual.h" for descriptions of the variables and the functions.
+
+"OtherFunctions.cpp" and "OtherFunctions.h": script defining additional basic functions (e.g., calculation of mean, generation of random numbers); see the header files "OtherFunctions.h" for descriptions of the functions.
+
+The script "Simulation_Accumulation.cpp" is used to run forward simulations. All variables are described in the functions 'main' within this file.
+
+The script "Sensitivity_Accumulation.cpp" is used to run a sensitivity analysis (variations of mortality and birth rates). All variables are described in the functions 'main' within this file.
+
+In the folder "AnalysisR", the R script to draw graphs resulting from the simulations using R language.
+
+* "Function_Pleiotropy.R":			Plot the factor change in fecundity depending on the age at which intrinsic mortality occurs (Figure B1 in Appendix B)
+
+* "TimeSeries.R":                    Plot figures describing the time series; obtained using 'SimulationNetwork.cpp'
+
+* "SensitivityAnalysis.R":           Plot figures describing the outcome of multiple simulations (like in Fig. 4); obtained using 'SimulationNetwork.cpp'
+
+* "AnalysisMutant.R":              Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'AnalysisMutant.cpp'
+
+
+
+## Demo and instructions for use
+
+All functions are written in the script files "ClassIndividual.cpp" and "ClassPopulation.cpp" (see the header files "ClassIndividual.h" and "ClassPopulation.h" for descriptions of the variables and the functions). This file must remain untouched. Additional functions are written in the files "OtherFunctions.cpp" and "OtherFunctions.h". All these files must remain untouched.
+
+Simulations are run using the scripts "Simulation_Accumulation.cpp" or "Sensitivity_Accumulation.cpp". One can change parameter values there. The command line (in Linux) is:
+
    ```sh
-   npm install
+   g++ -std=c++14 -O2  Simulation_Accumulation.cpp ClassPopulation.cpp ClassIndividual.cpp OtherFunctions.cpp
+   ./a.out
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
+   
+   ```sh
+   g++ -std=c++14 -O2  Sensitivity_Accumulation.cpp ClassPopulation.cpp ClassIndividual.cpp OtherFunctions.cpp
+   ./a.out
    ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Data are then stored in the folder "Data".
 
+In the folder "AnalysisR", use the R script to draw graphs resulting from the simulations using R language.
 
+Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted ~24 hours). That is why the figures created by the Demo code are different from the ones in the manuscript. To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).
 
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTACT -->
-## Contact
-
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
-
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
-
-* [Choose an Open Source License](https://choosealicense.com)
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
-* [Malven's Grid Cheatsheet](https://grid.malven.co/)
-* [Img Shields](https://shields.io)
-* [GitHub Pages](https://pages.github.com)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
-[contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
-[stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/othneildrew
-[product-screenshot]: images/screenshot.png
