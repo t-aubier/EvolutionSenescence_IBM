@@ -1,12 +1,31 @@
+##### Directory
+
+setwd("/home/taubier/Projets/Github/EvolutionSenescence_IBM")     # change the working directory
+
+##### Packages
+
 library(scales)
+library(ggplot2)
+library(cowplot)
+theme_set(theme_cowplot())
+
+##########  PLOT THE FACTOR CHANGE IN FECUNDITY DEPENDING ON THE AGE AT WHICH INTRINSIC MORTALITY OCCURS  ##########  
 
 
-convertIntoYears = 12
-ageVec = seq(0,30*convertIntoYears,by=1)
-gammaP =  50   /365
-alphamaxVec = c(1,5,50)
+##### Parameters
 
-maxFecundityPlot = 50
+convertIntoYears = 12       # Discretization of one year into time steps
+                            # Depending on the simulation: if time steps = months: 12 ; if time steps = days: 365
+
+ageVec = seq(0,30*convertIntoYears,by=1)  # Age considered
+gammaP =  50   /365                       # Rate at which fecundity decreases with the age at which intrinsic mortality occurs (called gamma in the manuscript)
+
+alphamaxVec = c(1,5,50)                   # Maximum fecundity when pleiotropy (when mutation expressed at age == 0)
+maxFecundityPlot = 50                     # Maximum value on the vertical axis
+
+
+
+##### Process data and plot
 
 AlphamaxVec = c()
 AgeVec = c()

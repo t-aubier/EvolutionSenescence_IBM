@@ -57,6 +57,7 @@ The script "Sensitivity_Accumulation.cpp" is used to run a sensitivity analysis 
 
 In the folder "AnalysisR", the R script to draw graphs resulting from the simulations using R language.
 
+Function_Pleiotropy.R			Plot the factor change in fecundity depending on the age at which intrinsic mortality occurs (Figure B1 in Appendix B)
 TimeSeries.R                    Plot figures describing the time series; obtained using 'SimulationNetwork.cpp'
 SensitivityAnalysis.R           Plot figures describing the outcome of multiple simulations (like in Fig. 4); obtained using 'SimulationNetwork.cpp'
 AnalysisMutant.R                Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'AnalysisMutant.cpp'
@@ -78,9 +79,5 @@ g++ -std=c++14 -O2  Sensitivity_Accumulation.cpp ClassPopulation.cpp ClassIndivi
 Data are then stored in the folder "Data".
 
 In the folder "AnalysisR", use the R script to draw graphs resulting from the simulations using R language.
-
-TimeSeries.R                    Plot figures describing the time series; obtained using 'SimulationNetwork.cpp'
-SensitivityAnalysis.R           Plot figures describing the outcome of multiple simulations (like in Fig. 4); obtained using 'SimulationNetwork.cpp'
-AnalysisMutant.R                Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'AnalysisMutant.cpp'
 
 Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted ~24 hours). That is why the figures created by the Demo code are different from the ones in the manuscript. To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).
