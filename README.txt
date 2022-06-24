@@ -57,10 +57,10 @@ The script "Sensitivity_Accumulation.cpp" is used to run a sensitivity analysis 
 
 In the folder "AnalysisR", the R script to draw graphs resulting from the simulations using R language.
 
-Function_Pleiotropy.R			Plot the factor change in fecundity depending on the age at which intrinsic mortality occurs (Figure B1 in Appendix B)
-TimeSeries.R                    Plot figures describing the time series; obtained using 'SimulationNetwork.cpp'
-SensitivityAnalysis.R           Plot figures describing the outcome of multiple simulations (like in Fig. 4); obtained using 'SimulationNetwork.cpp'
-AnalysisMutant.R                Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'AnalysisMutant.cpp'
+Function_Pleiotropy.R									Plot the factor change in fecundity depending on the age at which intrinsic mortality occurs (Figure B1 in Appendix B)
+Plot_AccumulationMutations_AnalyticalDerivations.R      Plot the accumulation of lethal mutations and the maximum lifespan for different grains of age dependence of mutation expression (Figures 1 and 2)
+SensitivityAnalysis.R           						Plot figures describing the outcome of multiple simulations (like in Fig. 4); obtained using 'SimulationNetwork.cpp'
+AnalysisMutant.R               							Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'AnalysisMutant.cpp'
 
 
 
