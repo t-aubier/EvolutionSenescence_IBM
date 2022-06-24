@@ -1,4 +1,4 @@
-last update: JUne 23th, 2022
+last update: June 23th, 2022
 
 
 #### General Information ####
