@@ -54,7 +54,11 @@
 
 ## System Requirements
 
-Simulations are run using C++ (compiler g++ 7.5.0).
+Simulations of the individual-based model are run using C++ (compiler g++ 7.5.0).
+
+Simulations based on the analytical derivations are run using R.
+
+Figures are drawn in R.  
 
 
 ## Installation guide
