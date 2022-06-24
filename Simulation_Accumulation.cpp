@@ -468,10 +468,10 @@ int main()
     int NbRep = 1;                                  // Number of replicates
 
     int Tburnin = 2;                                // Burn-in period to assess population extinction before mutation accumulations (in years)
-    int Tmax = 100000;                              // Simulation sime (in years) ; 3e6
-    int Tstep = 1000;                               // Time at which information is recoreded (in years) ; 2e4
+    int Tmax = 1e5;                                 // Simulation sime (in years)
+    int Tstep = 5e3;                                // Time at which information is recoreded (in years)
 
-    std::string Namefile = "Run12somaticMonthRangeMonthAlphaMax1Rate50_NoratioRev_Rep1_maxAge50QuantStart09_Mut2e3Range1K500DdepF_birth15extrMort1lin";
+    std::string Namefile = "test_simulation";
 
     // Conversion from year to month (if each time step = month; if convertIntoYear==12) or to day (if each time step = day; if convertIntoYear==365)
 
