@@ -120,6 +120,9 @@ Data are then stored in the folder "Data".
 
 In the folder "AnalysisR", use the R script to draw graphs resulting from the simulations using R language.
 
+
+## Simulation experiments
+
 Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted few days). That is why the figures created by the Demo code are different from the ones in the manuscript (so that the sensitivity analysis is done in less than one day). To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).
 
 
