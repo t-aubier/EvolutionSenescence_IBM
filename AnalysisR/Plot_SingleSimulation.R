@@ -14,9 +14,9 @@ theme_set(theme_cowplot())
 
 ##### Parameters
 
-nameFileVec = c("test_simulation")
-divisionYear = 12     # 12 or 365 depending on the simulation
-divisionTime = 1000
+nameFileVec = c("example_simulation")   # name of the file
+divisionYear = 12                       # 12 or 365 depending on the simulation
+divisionTime = 1000                     # to change the x-axis and to represent thousands of years
 
 
 ##### Process data and plot
