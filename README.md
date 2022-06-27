@@ -27,7 +27,7 @@
 
 * Author Information:
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Corresponding Investigator:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Corresponding investigator:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: Dr. Thomas G. Aubier
 
@@ -78,15 +78,15 @@ Overall installation time is short: < 5 min
 
 Oriented-based programming in C++ with modeling of two different classes 'Population' and 'Individual':
 
-"ClassPopulation.cpp" and "ClassPopulation.h": script defining the class 'Population' referring to a population of individuals; see the header files "ClassPopulation.h" for descriptions of the variables and the functions.
+* "ClassPopulation.cpp" and "ClassPopulation.h": script defining the class 'Population' referring to a population of individuals; see the header files "ClassPopulation.h" for descriptions of the variables and the functions.
 
-"ClassIndividual.cpp" and "ClassIndividual.h": script defining the class 'ClassIndividual' referring a single individual; see the header files "ClassIndividual.h" for descriptions of the variables and the functions.
+* "ClassIndividual.cpp" and "ClassIndividual.h": script defining the class 'ClassIndividual' referring a single individual; see the header files "ClassIndividual.h" for descriptions of the variables and the functions.
 
-"OtherFunctions.cpp" and "OtherFunctions.h": script defining additional basic functions (e.g., calculation of mean, generation of random numbers); see the header files "OtherFunctions.h" for descriptions of the functions.
+* "OtherFunctions.cpp" and "OtherFunctions.h": script defining additional basic functions (e.g., calculation of mean, generation of random numbers); see the header files "OtherFunctions.h" for descriptions of the functions.
 
-The script "Simulation_Accumulation.cpp" is used to run forward simulations. All variables are described in the functions 'main' within this file.
+* The script "Simulation_Accumulation.cpp" is used to run forward simulations. All variables are described in the functions 'main' within this file.
 
-The script "Sensitivity_Accumulation.cpp" is used to run a sensitivity analysis (variations of mortality and birth rates). All variables are described in the functions 'main' within this file.
+* The script "Sensitivity_Accumulation.cpp" is used to run a sensitivity analysis (variations of mortality and birth rates). All variables are described in the functions 'main' within this file.
 
 In the folder "AnalysisR", the R script to draw graphs resulting from the simulations using R language.
 
@@ -123,7 +123,11 @@ In the folder "AnalysisR", use the R script to draw graphs resulting from the si
 
 ## Simulation experiments
 
+<<<<<<< HEAD
 Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted few days). That is why the figures created by the Demo code are different from the ones in the manuscript (so that the sensitivity analysis is done in less than one day). To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).
+=======
+Note that to draw the figures shown in the manuscript (using Simulation_Accumulation.cpp), considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted ~24 hours). That is why the figures created by the code are different from the ones in the manuscript. To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code "Simulation_Accumulation.cpp").
+>>>>>>> 6a6c5aa52d1de4ed5b8aa97ee3b56771830c5d27
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
