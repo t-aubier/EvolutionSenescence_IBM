@@ -123,11 +123,7 @@ In the folder "AnalysisR", use the R script to draw graphs resulting from the si
 
 ## Simulation experiments
 
-<<<<<<< HEAD
 Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted few days). That is why the figures created by the Demo code are different from the ones in the manuscript (so that the sensitivity analysis is done in less than one day). To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).
-=======
-Note that to draw the figures shown in the manuscript (using Simulation_Accumulation.cpp), considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted ~24 hours). That is why the figures created by the code are different from the ones in the manuscript. To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code "Simulation_Accumulation.cpp").
->>>>>>> 6a6c5aa52d1de4ed5b8aa97ee3b56771830c5d27
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
