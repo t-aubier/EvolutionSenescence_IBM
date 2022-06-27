@@ -60,7 +60,7 @@ In the folder "AnalysisR", the R script to draw graphs resulting from the simula
 Function_Pleiotropy.R									Plot the factor change in fecundity depending on the age at which intrinsic mortality occurs (Figure B1 in Appendix B)
 Plot_AccumulationMutations_AnalyticalDerivations.R      Plot the accumulation of lethal mutations and the maximum lifespan for different grains of age dependence of mutation expression (Figures 1 and 2)
 Plot_SingleSimulation.R           						Plot figures describing the outcome of single simulations (like in Figs. B4 and B5 in Appendix B); obtained using 'Simulation_Accumulation.cpp'
-AnalysisMutant.R               							Plot figures describing the fate of mutants with specific trait values (like in Fig. 5); obtained using 'Sensitivity_Accumulation.cpp'
+Plot_SensitivityAnalysis.R               				Plot figures describing the sensitivity analyses (like in Fig. B2); obtained using 'Sensitivity_Accumulation.cpp'
 
 
 
@@ -80,4 +80,4 @@ Data are then stored in the folder "Data".
 
 In the folder "AnalysisR", use the R script to draw graphs resulting from the simulations using R language.
 
-Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted ~24 hours). That is why the figures created by the Demo code are different from the ones in the manuscript. To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).
+Note that to draw the figures shown in the manuscript, considerable computing power was needed (via the use of a computing cluster; each simulation typically lasted few days). That is why the figures created by the Demo code are different from the ones in the manuscript (so that the sensitivity analysis is done in less than one day). To reproduce the figures in the manuscript, one can change the parameter values to match the default values (default value are commented in the code).

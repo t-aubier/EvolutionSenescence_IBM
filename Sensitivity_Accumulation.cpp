@@ -461,13 +461,13 @@ int main()
 
     // Parameters
 
-    int carryingCapacity = 500;                     // Carrying capacity
+    int carryingCapacity = 100;                     // Carrying capacity; default value: 500
     bool densityDependenceSurvival = false;         // Whether survival is adjusted when N<CarryingCapacity after recruitment
 
     double alphaMax = 1.0;                          // Maximum fecundity when pleiotropy (when mutation expressed at age == 0)
     double rateAlphaFecundityYear = 50     /365;    // Rate at which fecundity decreases with the age at which intrinsic mortality occurs (called gamma in the manuscript)
 
-    double convertIntoYear = 365;                   // Discretization of one year into time steps
+    double convertIntoYear = 12;                   // Discretization of one year into time steps
                                                     // Depending on the simulation: if time steps = months: 12 ; if time steps = days: 365
                                                     // Considering that time steps are months instead of days decreases simulation runtime
 
@@ -483,12 +483,12 @@ int main()
     bool startAtEarlierLifeSpan = true;             // If true, implement a lethal mutation expressed at a late age
                                                     // It decreases simulation runtime because the first lethal mutation expressed at very late age
                                                     // take a long time to fixate
-    double quantileStart = 0.8;                     // If startAtEarlierLifeSpan==true, it defines the quantile of lifespan at which the fist lethal mutation is expressed
-
+    double quantileStart = 0.5;                     // If startAtEarlierLifeSpan==true, it defines the quantile of lifespan at which the fist lethal mutation is expressed
+                                                    // default value: 0.8
 
     double probDeleteriousMutationPerAge = 2e-3;    // Probability of getting a deleterious mutation expressed at a given age
 
-    bool boolReverseMutation = true;                // if true, beneficial 'reverse' mutations can occur
+    bool boolReverseMutation = false;               // if true, beneficial 'reverse' mutations can occur
     double ratioReverseMutation = 1.0;              // if boolReverseMutation==true, proportion of beneficial mutations relative to deleterious mutations
 
     double effectSurvDeleteriousMutation = 1.0;     // Survival probability reduced due to the expression of a single deleterious mutation (if ==1, lethal mutation)
@@ -502,15 +502,15 @@ int main()
 
     // Characteristics sensitivity analysis
 
-    int Tburnin = 2e3;                              // Burn-in period to assess population extinction before mutation accumulations (in years)
-    int Tmax = 1e6;                                 // Simulation sime (in years) ; 3e6
+    int Tburnin = 2e3;                              // Burn-in period to assess population extinction before mutation accumulations (in years); default value: 2e3
+    int Tmax = 1e5;                                 // Simulation sime (in years); default value: 1e6
 
-    std::string Namefile = "RunNew03_scale365range1_Alpha1Rate50_reverseTratio1over1_K500DdepFQuantStart08_Mut2e3";
+    std::string Namefile = "exampleMonth_convertIntoYear365rangeEffect1";
 
-    int rep = 1;                                    // replicate index
+    int rep = 1;                                    // replicate index ; in demo simulation, rep = 1 and 2; in manuscript, default value:rep = 1 to 10
     Namefile=Namefile+"_Rep"+std::to_string(rep);   // we increment the replicate index to the name of the file
 
-    double nbValuesTested = 20;                     // Number of parameter values tested
+    double nbValuesTested = 5;                     // Number of parameter values tested; default value: 20
 
     double minBirthRatePerYear = 0.1;               // Minimum birth rate (per year) tested
     double maxBirthRatePerYear = 2.0;               // Maximum birth rate (per year) tested
