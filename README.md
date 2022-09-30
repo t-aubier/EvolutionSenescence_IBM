@@ -21,7 +21,7 @@
 
 <!-- ABOUT THE PROJECT -->
 
-# Code from: Deleterious mutation accumulation and the evolution of senescence
+# Code from: The evolution of senescence under deleterious mutation accumulation
 
 ## General Information
 
