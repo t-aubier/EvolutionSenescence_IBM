@@ -49,7 +49,7 @@
 * Funding sources that supported code development: Swiss National Science Foundation, and National Science Foundation
 <br />
 
-* Recommended citation for this code: Aubier and Galipaud (2022), Code from: Deleterious mutation accumulation and the evolution of senescence, GitHub repository, https://github.com/t-aubier/EvolutionSenescence_IBM
+* Recommended citation for this code: Aubier and Galipaud (2022), Code from: The evolution of senescence under deleterious mutation accumulation, GitHub repository, https://github.com/t-aubier/EvolutionSenescence_IBM
 
 
 ## System Requirements
