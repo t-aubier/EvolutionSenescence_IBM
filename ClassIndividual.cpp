@@ -26,7 +26,7 @@ Individual::Individual( const int& indexPopulation,
                         const int& maxDamageConsidered,
                         const double& probSurvExtrinsicMortality,
                         const double& rateAccumul,
-                        const double& convertIntoYear,
+                        const double& convertIntoYear, 
                         const std::string& typeAccumulation
                       ){
     
