@@ -21,7 +21,7 @@
 
 <!-- ABOUT THE PROJECT -->
 
-# Code from: The evolution of senescence under deleterious mutation accumulation
+# Code from: Senescence evolution under the catastrophic accumulation of deleterious mutations
 
 ## General Information
 
@@ -39,7 +39,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: Dr. Matthias Galipaud
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Institution: University of Zürich, Switzerland
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Institution: ETH Zurich, Switzerland
 
 <br />
 
@@ -49,7 +49,7 @@
 * Funding sources that supported code development: Swiss National Science Foundation, and National Science Foundation
 <br />
 
-* Recommended citation for this code: Aubier and Galipaud (2022), Code from: The evolution of senescence under deleterious mutation accumulation, GitHub repository, https://github.com/t-aubier/EvolutionSenescence_IBM
+* Recommended citation for this code: Aubier and Galipaud (2022), Code from: Senescence evolution under the catastrophic accumulation of deleterious mutations, GitHub repository, https://github.com/t-aubier/EvolutionSenescence_IBM
 
 
 ## System Requirements
